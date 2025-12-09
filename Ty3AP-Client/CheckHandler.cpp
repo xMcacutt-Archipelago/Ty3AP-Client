@@ -1,117 +1,6 @@
 #include "pch.h"
 #include "CheckHandler.h"
 typedef void(__stdcall* FunctionType)();
-FunctionType CollectCollectibleOrigin = nullptr;
-uintptr_t CollectCollectibleOriginReturnAddr;
-
-__declspec(naked) void __stdcall CheckHandler::CollectCollectibleHook() {
-	_asm {
-		push ebx
-		push edx
-		push edi
-		push eax
-		push ecx
-		push esi
-		call CheckHandler::OnCollectCollectible
-		pop esi
-		pop ecx
-		pop eax
-		pop edi
-		pop edx
-		pop ebx
-		lea edi, [edx + eax * 0x4]
-		mov eax, ecx
-		jmp dword ptr[CollectCollectibleOriginReturnAddr]
-	}
-}
-
-FunctionType CompleteMissionOrigin = nullptr;
-uintptr_t CompleteMissionOriginReturnAddr;
-uintptr_t CompleteMissionBranchReturnAddr;
-uintptr_t CompleteMissionConditionReturnAddr;
-
-static bool __stdcall IsVanilla() {
-	return ArchipelagoHandler::slotdata->barrierUnlockStyle == BarrierUnlock::Vanilla;
-}
-
-__declspec(naked) void __stdcall CheckHandler::CompleteMissionHook() {
-	_asm {
-		pushfd
-		pushad
-		push edx
-		push ecx
-		call CheckHandler::OnCompleteMission
-		pop ecx
-		pop edx
-		popad
-		popfd
-		call IsVanilla
-		cmp al, 1
-		je is_vanilla
-		push eax
-		movzx eax, word ptr[ecx+0x4]
-		cmp eax, 980
-		je barrier
-		cmp eax, 981
-		je barrier
-		cmp eax, 982
-		je barrier
-		pop eax
-	is_vanilla:
-		cmp edx, 5
-		jne not_equal
-		jmp dword ptr[CompleteMissionOriginReturnAddr]
-	not_equal:
-		jmp dword ptr[CompleteMissionBranchReturnAddr]
-	barrier:
-		pop eax
-		push esi 
-		mov esi,[ecx+0x2C]
-		jmp dword ptr[CompleteMissionConditionReturnAddr]
-	}
-}
-
-FunctionType PurchaseItemOrigin = nullptr;
-uintptr_t PurchaseItemOriginReturnAddr;
-
-__declspec(naked) void __stdcall CheckHandler::PurchaseItemHook() {
-	_asm {
-		push ebx
-		push edi
-		push esi
-		push edx
-		push ecx
-		push eax
-		call CheckHandler::OnBuyItem
-		pop eax
-		pop ecx
-		pop edx
-		pop esi
-		pop edi
-		pop ebx
-		push 0x2EE
-		jmp dword ptr[PurchaseItemOriginReturnAddr]
-	}
-}
-
-
-
-
-void CheckHandler::SetupHooks() {
-	CollectCollectibleOriginReturnAddr = Core::moduleBase + 0x0011b2ba + 5;
-	auto ccaddr = (char*)(Core::moduleBase + 0x0011b2ba);
-	MH_CreateHook((LPVOID)ccaddr, &CollectCollectibleHook, reinterpret_cast<LPVOID*>(&CollectCollectibleOrigin));
-
-	CompleteMissionOriginReturnAddr = Core::moduleBase + 0x0029734f + 5;
-	CompleteMissionBranchReturnAddr = Core::moduleBase + 0x00297364;
-	CompleteMissionConditionReturnAddr = Core::moduleBase + 0x29736b;
-	auto cmaddr = (char*)(Core::moduleBase + 0x0029734f);
-	MH_CreateHook((LPVOID)cmaddr, &CompleteMissionHook, reinterpret_cast<LPVOID*>(&CompleteMissionOrigin));
-
-	PurchaseItemOriginReturnAddr = Core::moduleBase + 0x001b1468;
-	auto piaddr = (char*)(Core::moduleBase + 0x001b145c);
-	MH_CreateHook((LPVOID)piaddr, &PurchaseItemHook, reinterpret_cast<LPVOID*>(&PurchaseItemOrigin));
-}
 
 void CheckHandler::OnCollectCollectible(int type, int id) {
 	//dont send on sanity
@@ -155,7 +44,7 @@ void CheckHandler::OnCompleteMission(void* mission, int status) {
 
 	if (value == 83) { //this is the cass boss fight id
 		API::LogPluginMessage("GOALLLLL");
-		ArchipelagoHandler::gameFinished();
+		ArchipelagoHandler::Release();
 	}
 	char letter = *reinterpret_cast<char*>(base + 0x7);  // read char
 	std::string Sid = std::string(1, letter) + std::to_string(value);

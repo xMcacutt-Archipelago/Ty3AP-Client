@@ -3,7 +3,7 @@
 #include "LoginWindow.h"
 #include <apuuid.hpp>
 
-#define UUID_FILE "uuid" // TODO: place in %appdata%
+#define UUID_FILE "uuid"
 
 using nlohmann::json;
 bool ap_connect_sent = false;
@@ -13,19 +13,25 @@ bool is_ws = false;
 std::string ArchipelagoHandler::uuid = "";
 bool ArchipelagoHandler::ap_connected = false;
 std::string ArchipelagoHandler::seed;
-std::string ArchipelagoHandler::slotname = "";
+std::string ArchipelagoHandler::slotName = "";
 bool ArchipelagoHandler::ap_sync_queued = false;
 bool ArchipelagoHandler::polling = false;
 bool ArchipelagoHandler::wrongVersion = false;
 
 SlotData* ArchipelagoHandler::slotdata = new SlotData();
 APSaveData* ArchipelagoHandler::customSaveData = new APSaveData();
-APClient* ArchipelagoHandler::ap = nullptr;
+std::unique_ptr<APClient> ArchipelagoHandler::ap;
 
 void ArchipelagoHandler::DisconnectAP() {
+	LoggerWindow::Log("Disconnected");
+	SetAPStatus("Disconnected", 1);
 	polling = false;
-	GameHandler::hasRunSetup = false;
-	LoggerWindow::Log("Try Disconnecting");
+	ap_connect_sent = false;
+	ap_connected = false;
+	if (GameState::IsOnMenu())
+		GameHandler::SetLoadActive(false);
+	else
+		GameState::ForceMainMenu();
 }
 
 void ArchipelagoHandler::ConnectAP(LoginWindow* login)
@@ -42,90 +48,49 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
 		ap->reset();
 	}
 
-	ap = new APClient(uuid, GAME_NAME, login->server);
-	ap_sync_queued = false;
+	ap.reset(new APClient(uuid, GAME_NAME, uri.empty() ? APClient::DEFAULT_URI : uri, CERT_STORE));
+	polling = true;
+	API::LogPluginMessage("Connecting to AP, server " + uri + "\n", LogLevel::Info);
+	SetAPStatus("Connecting", 1);
 
 	ap->set_slot_connected_handler([login](const json& data) {
-		
-		slotname = login->slot;
+		ap_connected = true;
+
+		if (data.find("ModVersion") != data.end() || data["ModVersion"] != VERSION_STRING)
+			LoggerWindow::Log("Your client and apworld versions do not match. This might be fine but please check for updates.");
+
+		// READ SLOT DATA HERE
+
 		LoggerWindow::Log("Connected");
 		login->SetMessage("Connected");
+
 		std::list<std::string> tags = {};
+
 		if (data.find("DeathLink") != data.end()){
 			slotdata->deathlink = data["DeathLink"].get<int>() == 1;
 			if (slotdata->deathlink) {
 				tags.push_back("DeathLink");
 			}
 		}
+
 		ap->ConnectUpdate(false, 0b111, true, tags);
 		ap->StatusUpdate(APClient::ClientStatus::PLAYING);
-		if (data.find("ModVersion") == data.end()) {
-			login->SetMessage("AP world is not Valid");
-			ArchipelagoHandler::DisconnectAP();
-			wrongVersion = true;
-		}
-		else if (data["ModVersion"].get<std::string>() != VERSION_STRING) {
-			LoggerWindow::Log("Your client and apworld versions do not match.");
-			login->SetMessage("AP world "+ data["ModVersion"].get<std::string>() +" incompatible");
-			ArchipelagoHandler::DisconnectAP();
-			wrongVersion = true;
-			return;
-		}
-		
-
-		if (data.find("ReqBosses") != data.end()) {
-			slotdata->requireBosses = data["ReqBosses"].get<int>() == 1;
-		}
-
-		if (data.find("MissionsToGoal") != data.end()) {
-			slotdata->missionsToGoal = data["MissionsToGoal"].get<int>();
-		}
-		if (data.find("ProgressiveRangs") != data.end()) {
-			slotdata->progressiveRangs = data["ProgressiveRangs"].get<int>() == 1;
-		}
-
-		if (data.find("BarrierUnlock") != data.end()) {
-			slotdata->barrierUnlockStyle = static_cast<BarrierUnlock>(data["BarrierUnlock"].get<int>());
-		}
-		if (data.find("SkipCurrawong") != data.end()) {
-			slotdata->skipCurrawong = data["SkipCurrawong"].get<int>() == 1;
-		}
-
-		if (data.find("RangPrices") != data.end() && data["RangPrices"].is_array()) {
-			auto rangPrices = data["RangPrices"].get<std::vector<int>>();
-			slotdata->rangPrices = rangPrices;
-		}
-
-		if (data.find("SlyPrices") != data.end() && data["SlyPrices"].is_array()) {
-			auto slyPrices = data["SlyPrices"].get<std::vector<int>>();
-			slotdata->slyPrices = slyPrices;
-		}
-
-		if (data.find("TraderBobPrices") != data.end() && data["TraderBobPrices"].is_array()) {
-			auto traderBobPrices = data["TraderBobPrices"].get<std::vector<int>>();
-			slotdata->traderBobPrices = traderBobPrices;
-		}
-
-		if (data.find("CogPrices") != data.end() && data["CogPrices"].is_array()) {
-			auto cogPrices = data["CogPrices"].get<std::vector<int>>();
-			slotdata->cogPrices = cogPrices;
-		}
-		if (data.find("OrbPrices") != data.end() && data["OrbPrices"].is_array()) {
-			auto orbPrices = data["OrbPrices"].get<std::vector<int>>();
-			slotdata->orbPrices = orbPrices;
-		}
-		if (slotdata->skipCurrawong) {
-			GameHandler::removeCurrawong();
-		}
-		//GameHandler::SetMissionRequirements(slotdata->barrierUnlockStyle, slotdata->missionsToGoal);
+		seed = ap->get_seed();
+		slotName = ap->get_slot();
+		ArchipelagoHandler::LoadSaveData();
 		GameHandler::EnableLoadButtons();
+		GameHandler::SetupOnConnect();
 	});
 	ap->set_slot_disconnected_handler([login]() { 
 		LoggerWindow::Log("Slot disconnected");
-		if (!wrongVersion) {
-			login->SetMessage("Disconnected");
-		}
-		
+		LoggerWindow::Log("Disconnected");
+		SetAPStatus("Disconnected", 1);
+		ap_connect_sent = false;
+		ap_connected = false;
+		if (GameState::IsOnMenu())
+			GameHandler::SetLoadActive(false);
+		else
+			GameState::ForceMainMenu();
 	});
 	ap->set_slot_refused_handler([login](const std::list<std::string>& errors) {
 		for (const auto& error : errors) {
@@ -135,15 +100,15 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
 	});
 	ap->set_print_json_handler([](const std::list<APClient::TextNode>& msg) {
 		LoggerWindow::Log(ap->render_json(msg, APClient::RenderFormat::TEXT));
-		});
+	});
 	ap->set_print_handler([](const std::string& msg) {
 		LoggerWindow::Log(msg);
-		});
-	ap->set_room_info_handler([login]() {
-		std::list<std::string> tags;
-		ap->ConnectSlot(login->slot, login->password, 0b111, tags, { 0,6,0 });
 	});
-
+	ap->set_room_info_handler([login]() {
+        login->SetMessage("Room info received");
+        ap->ConnectSlot(login->slot, login->password, 0b111, {}, { 0,6,0 });
+        ap_connect_sent = true;
+	});
 	ap->set_items_received_handler([](const std::list<APClient::NetworkItem>& items) {
 		if (!ap->is_data_package_valid()) {
 			if (!ap_sync_queued) {
@@ -153,9 +118,6 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
 			return;
 		}
 		for (const auto& item : items) {
-			
-			std::string sender = ap->get_player_alias(item.player);
-			//std::string location = ap->get_location_name(item.location, );
 			ItemHandler::HandleItem(item);
 		}
 	});
@@ -171,7 +133,7 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
 			{
 				if (dataIt != cmd.end() && dataIt->is_object()) {
 					json data = *dataIt;
-					if (data["source"].get<std::string>() != slotname) {
+					if (data["source"].get<std::string>() != slotName) {
 						std::string source = data["source"].is_string() ? data["source"].get<std::string>().c_str() : "???";
 						std::string cause = data["cause"].is_string() ? data["cause"].get<std::string>().c_str() : "???";
 						LoggerWindow::Log("[color = FFFFFFFF]" + cause);
@@ -192,7 +154,7 @@ void ArchipelagoHandler::SendLocation(int64_t locationId) {
 	ap->LocationChecks(check);
 }
 
-void ArchipelagoHandler::gameFinished() {
+void ArchipelagoHandler::Release() {
 	ap->StatusUpdate(APClient::ClientStatus::GOAL);
 }
 
@@ -200,14 +162,6 @@ void ArchipelagoHandler::Poll() {
 	while (true) {
 		if (ap && polling) {
 			ap->poll();
-			if (GameHandler::IsInGame()) {
-				if (!GameHandler::hasRunSetup) {
-					GameHandler::RunLoadSetup(slotdata);
-				}
-			}
-			else {
-				GameHandler::hasRunSetup = false;
-			}
 		}
 	}
 }
@@ -243,21 +197,29 @@ const std::vector<std::string> deathCauses{
 	"tried to code an AP game"
 };
 
+void ArchipelagoHandler::SetAPStatus(std::string status, char important) {
+	API::LogPluginMessage("AP status: " + status);
+}
+
+bool ArchipelagoHandler::LoadSaveData() {
+	return SaveDataHandler::LoadSaveData(seed, slot);
+}
+
 std::string GetRandomCause() {
-	if (deathCauses.empty()) return ""; // Handle empty list case
-	std::random_device rd;  // Obtain a random seed
-	std::mt19937 gen(rd()); // Mersenne Twister PRNG
+	if (deathCauses.empty()) return "";
+	std::random_device rd;
+	std::mt19937 gen(rd());
 	std::uniform_int_distribution<int> dist(0, deathCauses.size() - 1);
 	return deathCauses[dist(gen)];
 }
 
 void ArchipelagoHandler::SendDeath() {
 	std::string cause = GetRandomCause();
-	LoggerWindow::Log("Death Sent:  " + slotname + " " + cause);
+	LoggerWindow::Log("Death Sent:  " + slotName + " " + cause);
 	json data{
 		{"time", ap->get_server_time()},
-		{"cause", slotname + " " + GetRandomCause()},
-		{"source", slotname},
+		{"cause", slotName + " " + GetRandomCause()},
+		{"source", slotName},
 	};
 	ap->Bounce(data, {}, {}, { "DeathLink" });
 }

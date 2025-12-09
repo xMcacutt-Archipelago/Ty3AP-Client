@@ -5,29 +5,19 @@
 bool disabledButtons = false;
 
 void TickBeforeGame(float deltaSeconds) {
-    
     GUI::DrawUI();
-    if (!disabledButtons && MKUI::GetMainMenu() != nullptr) {
-        GameHandler::DisableLoadButtons();
-        disabledButtons = true;
-    }
-
-    if (GameHandler::g_SaveCallback.active) {
-        if (--GameHandler::g_SaveCallback.framesRemaining <= 0) {
-            if (GameHandler::g_SaveCallback.callback != nullptr) {
-                GameHandler::g_SaveCallback.callback();
-                GameHandler::g_SaveCallback.callback = nullptr;
+    if (SaveDataHandler::g_SaveCallback.active) {
+        if (--SaveDataHandler::g_SaveCallback.framesRemaining <= 0) {
+            if (SaveDataHandler::g_SaveCallback.callback != nullptr) {
+                SaveDataHandler::g_SaveCallback.callback();
+                SaveDataHandler::g_SaveCallback.callback = nullptr;
             }
             else {
-                *(DWORD*)(GameHandler::g_SaveCallback.esi + 0x238) = 0;  // Mark save complete
+                *(DWORD*)(SaveDataHandler::g_SaveCallback.esi + 0x238) = 0;
             }
-            GameHandler::g_SaveCallback.active = false;
-            
-            
+            SaveDataHandler::g_SaveCallback.active = false;
         }
     }
-
-    
 }
 
 void OnTyInit() {
@@ -41,7 +31,6 @@ void OnTyBeginShutdown() {
 }
 
 extern "C" __declspec(dllexport) bool TygerFrameworkPluginInitialize(TygerFrameworkPluginInitializeParam* param) {
-    //Make sure to call this first before any API Functions
     if (!API::Initialize(param))
         return false;
 
@@ -59,5 +48,5 @@ extern "C" __declspec(dllexport) void TygerFrameworkPluginRequiredVersion(TygerF
     version->Major = 1;
     version->Minor = 1;
     version->Patch = 3;
-    version->CompatibleGames = { 2 };
+    version->CompatibleGames = { 3 };
 }
