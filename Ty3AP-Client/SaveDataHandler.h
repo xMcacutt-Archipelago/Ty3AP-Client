@@ -2,7 +2,6 @@
 #include "ArchipelagoHandler.h"
 #include "CheckHandler.h"
 #include "APSaveData.h"
-#include "nlohmann/json.hpp"
 #include "ShopHandler.h"
 
 class SaveDataHandler
@@ -16,7 +15,7 @@ public:
 	};
 	static inline char* saveFileBuffer = nullptr;
 	static inline int saveFileLength = 0;
-	static inline SaveCallbackInfo g_SaveCallback = { nullptr,0, 0, false };
+	static inline SaveCallbackInfo g_SaveCallback = { nullptr, 0, 0, false };
 	static void LoadAPSaveFile();
 	static int RecalcSaveDataSize();
 	static int SaveFile(const char* filename, void* data, int size);

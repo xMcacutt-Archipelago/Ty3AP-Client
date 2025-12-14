@@ -7,11 +7,14 @@
 #include "ItemHandler.h"
 #include "GameState.h"
 #include "Version.h"
+#include "LoginHandler.h"
 
-#define CERT_STORE "cacert.pem"
+constexpr auto CERT_STORE = "cacert.pem";
 class LoginWindow;
 
-#define UUID_FILE "uuid"
+constexpr auto UUID_FILE = "uuid";
+
+class APSaveData;
 
 class ArchipelagoHandler
 {
@@ -28,6 +31,8 @@ public:
 	static std::string GetLocationName(int64_t id, int player);
 	static bool ScoutLocations(std::list<int64_t> locations, int create_as_hint = 0);
 	static void SendLocation(int64_t locationId);
+	static bool IsLocationChecked(int64_t locationId);
+	static int CountLocationsChecked(const std::list<int64_t>& locationId);
 	static void SetAPStatus(std::string status, char important);
 	static bool LoadSaveData();
 	static std::string uuid;

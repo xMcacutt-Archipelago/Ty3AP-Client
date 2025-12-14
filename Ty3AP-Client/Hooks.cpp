@@ -26,7 +26,10 @@ __declspec(naked) void __stdcall Hooks::MenuLoadedHook() {
 		call GameHandler::OnMenuLoaded
 		popfd
 		popad
-		mov byte ptr[edx + ecx + 0x44], 1
+		pop esi
+		pop edi
+		pop ebx
+		test eax,eax
 		jmp dword ptr[MenuLoadedOriginReturnAddr]
 	}
 }
@@ -56,21 +59,36 @@ __declspec(naked) void __stdcall Hooks::CollectCollectibleHook() {
 
 FunctionType CompleteMissionOrigin = nullptr;
 uintptr_t CompleteMissionOriginReturnAddr;
+uintptr_t CompleteMissionSkipOriginReturnAddr;
 __declspec(naked) void __stdcall Hooks::CompleteMissionHook() {
 	_asm {
-		pushfd
-		pushad
-		push edx
-		push eax
-		call CheckHandler::OnCompleteMission
-		pop eax
-		pop edx
-		popad
-		popfd
-		sub esp,14
-		push ebx
-		push ebp
-		jmp dword ptr[CompleteMissionOriginReturnAddr]
+		pushfd;
+		pushad;
+		mov ebp,[esp+0x28]
+		cmp ebp, 1;
+		je we_need_to_check_this_one;
+		cmp ebp, 3;
+		jne normal_restore;
+	we_need_to_check_this_one:
+		push ecx;
+		call GameHandler::CanActivateMission;
+		cmp eax,1;
+		je normal_restore;
+		popad;
+		popfd;
+		jmp dword ptr[CompleteMissionSkipOriginReturnAddr];
+	normal_restore:
+		push ebp;
+		push ecx;
+		call CheckHandler::OnCompleteMission;
+		pop ecx;
+		pop ebp;
+		popad;
+		popfd;
+		sub esp, 0x14;
+		push ebx;
+		push ebp;
+		jmp dword ptr[CompleteMissionOriginReturnAddr];
 	}
 }
 
@@ -100,7 +118,6 @@ FunctionType LoadSaveFileOrigin = nullptr;
 uintptr_t LoadSaveFileOriginReturnAddr;
 __declspec(naked) void __stdcall Hooks::LoadSaveFileHook() {
 	_asm {
-		add esp, 0x8
 		call SaveDataHandler::LoadAPSaveFile
 
 		mov eax, SaveDataHandler::saveFileLength
@@ -140,54 +157,92 @@ uintptr_t SaveFileOriginReturnAddr;
 __declspec(naked) void __stdcall Hooks::SaveFileHook() {
 	_asm {
 		call SaveDataHandler::SaveFile
-		//add esp, 0xC
+		add esp, 0xC
 		jmp dword ptr[SaveFileOriginReturnAddr]
+	}
+}
+
+FunctionType ChunkLoadedOrigin = nullptr;
+uintptr_t ChunkLoadedOriginReturnAddr;
+__declspec(naked) void __stdcall Hooks::ChunkLoadedHook() {
+	_asm {
+		pushfd
+		pushad
+		call GameHandler::OnChunkLoaded
+		popad
+		popfd
+		pop esi
+		pop edi
+		add esp,0x48
+		jmp dword ptr[ChunkLoadedOriginReturnAddr]
 	}
 }
 
 void Hooks::SetupHooks() {
 	char* addr;
 
-	GameLoadedOriginReturnAddr = Core::moduleBase + 0x234492 + 7;
-	addr = (char*)(Core::moduleBase + 0x234492);
+	GameLoadedOriginReturnAddr = Core::moduleBase + 0x1fa4e1 + 5;
+	addr = (char*)(Core::moduleBase + 0x1fa4e1);
 	MH_CreateHook((LPVOID)addr, &GameLoadedHook, reinterpret_cast<LPVOID*>(&GameLoadedOrigin));
 
 	MenuLoadedOriginReturnAddr = Core::moduleBase + 0x21A8EB;
-	auto addr = (char*)(Core::moduleBase + 0x21A8E6);
+	addr = (char*)(Core::moduleBase + 0x21A8E6);
 	MH_CreateHook((LPVOID)addr, &MenuLoadedHook, reinterpret_cast<LPVOID*>(&MenuLoadedOrigin));
 
 	CollectCollectibleOriginReturnAddr = Core::moduleBase + 0x11179a + 5;
-	auto addr = (char*)(Core::moduleBase + 0x11179a);
+	addr = (char*)(Core::moduleBase + 0x11179a);
 	MH_CreateHook((LPVOID)addr, &CollectCollectibleHook, reinterpret_cast<LPVOID*>(&CollectCollectibleOrigin));
 
 	CompleteMissionOriginReturnAddr = Core::moduleBase + 0x1143b0 + 5;
-	auto addr = (char*)(Core::moduleBase + 0x1143b0);
+	CompleteMissionSkipOriginReturnAddr = Core::moduleBase + 0x114657;
+	addr = (char*)(Core::moduleBase + 0x1143b0);
 	MH_CreateHook((LPVOID)addr, &CompleteMissionHook, reinterpret_cast<LPVOID*>(&CompleteMissionOrigin));
 
 	PurchaseItemOriginReturnAddr = Core::moduleBase + 0x1db792 + 5;
-	auto addr = (char*)(Core::moduleBase + 0x1db792);
+	addr = (char*)(Core::moduleBase + 0x1db792);
 	MH_CreateHook((LPVOID)addr, &PurchaseItemHook, reinterpret_cast<LPVOID*>(&PurchaseItemOrigin));
 
 	LoadSaveFileOriginReturnAddr = Core::moduleBase + 0x3470bf + 5;
-	auto loadaddr = (char*)(Core::moduleBase + 0x3470bf);
-	MH_CreateHook((LPVOID)loadaddr, &LoadSaveFileHook, reinterpret_cast<LPVOID*>(&LoadSaveFileOrigin));
+	addr = (char*)(Core::moduleBase + 0x3470bf);
+	MH_CreateHook((LPVOID)addr, &LoadSaveFileHook, reinterpret_cast<LPVOID*>(&LoadSaveFileOrigin));
 
 	RecalcSaveDataSize1OriginReturnAddr = Core::moduleBase + 0x2535b6 + 7;
-	auto size1addr = (char*)(Core::moduleBase + 0x2535b6);
-	MH_CreateHook((LPVOID)size1addr, &RecalcSaveDataSize1Hook, reinterpret_cast<LPVOID*>(&RecalcSaveDataSize1Origin));
+	addr = (char*)(Core::moduleBase + 0x2535b6);
+	MH_CreateHook((LPVOID)addr, &RecalcSaveDataSize1Hook, reinterpret_cast<LPVOID*>(&RecalcSaveDataSize1Origin));
 
 	RecalcSaveDataSize2OriginReturnAddr = Core::moduleBase + 0x211de3 + 7;
-	auto size2addr = (char*)(Core::moduleBase + 0x211de3);
-	MH_CreateHook((LPVOID)size2addr, &RecalcSaveDataSize2Hook, reinterpret_cast<LPVOID*>(&RecalcSaveDataSize2Origin));
+	addr = (char*)(Core::moduleBase + 0x211de3);
+	MH_CreateHook((LPVOID)addr, &RecalcSaveDataSize2Hook, reinterpret_cast<LPVOID*>(&RecalcSaveDataSize2Origin));
 
-	SaveFileOriginReturnAddr = Core::moduleBase + 0x347557 + 5;
-	auto saveaddr = (char*)(Core::moduleBase + 0x347557);
-	MH_CreateHook((LPVOID)saveaddr, &SaveFileHook, reinterpret_cast<LPVOID*>(&SaveFileOrigin));
+	SaveFileOriginReturnAddr = Core::moduleBase + 0x346fca + 5;
+	addr = (char*)(Core::moduleBase + 0x346fca);
+	MH_CreateHook((LPVOID)addr, &SaveFileHook, reinterpret_cast<LPVOID*>(&SaveFileOrigin));
 
-	GameHandler::SetToNoOperation((void*)(Core::moduleBase + 0x3470A5), 24);
-	GameHandler::SetToJmp((void*)(Core::moduleBase + 0x3470E8));
-	GameHandler::SetToNoOperation((void*)(Core::moduleBase + 0x347109), 6);
-	GameHandler::SetToNoOperation((void*)(Core::moduleBase + 0x347817), 17);
+	ChunkLoadedOriginReturnAddr = Core::moduleBase + 0x18DBCA + 5;
+	addr = (char*)(Core::moduleBase + 0x18DBCA);
+	MH_CreateHook((LPVOID)addr, &ChunkLoadedHook, reinterpret_cast<LPVOID*>(&ChunkLoadedOrigin));
 
-	GameHandler::SetToNoOperation((void*)(Core::moduleBase + 0x1117bd), 6);
+	addr = (char*)(Core::moduleBase + 0x1608C0);
+	MH_CreateHook((LPVOID)addr, &GameHandler::OnDeath, reinterpret_cast<void**>(&GameHandler::stateTransitionFunc));
+
+	addr = (char*)(Core::moduleBase + 0x313940);
+	MH_CreateHook((LPVOID)addr, &ShopHandler::OnGetString, reinterpret_cast<void**>(&ShopHandler::getStringFunc));
+
+	GameHandler::SetToNoOperation((uintptr_t*)(Core::moduleBase + 0x3470A5), 26);
+	GameHandler::SetToJmp((uintptr_t*)(Core::moduleBase + 0x3470E8));
+	GameHandler::SetToNoOperation((uintptr_t*)(Core::moduleBase + 0x347109), 6);
+	GameHandler::SetToNoOperation((uintptr_t*)(Core::moduleBase + 0x34780C), 28);
+
+	// Prevent collectible increment
+	GameHandler::SetToNoOperation((uintptr_t*)(Core::moduleBase + 0x1117bd), 6);
+
+	// Prevent purchase increment
+	GameHandler::SetToNoOperation((uintptr_t*)(Core::moduleBase + 0x1db797), 3);
+
+	// Prevent found item increment
+	GameHandler::SetToNoOperation((uintptr_t*)(Core::moduleBase + 0x18bc53), 3);
+	GameHandler::SetToNoOperation((uintptr_t*)(Core::moduleBase + 0x139FF6), 3);
+
+	// Prevent ever adding to the spent count of non-opal currencies
+	GameHandler::SetToNoOperation((uintptr_t*)(Core::moduleBase + 0x1db72d), 6);
 }

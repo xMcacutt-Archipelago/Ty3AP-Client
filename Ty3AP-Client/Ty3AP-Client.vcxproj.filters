@@ -19,11 +19,11 @@
     <Filter Include="Source Files\Dependencies">
       <UniqueIdentifier>{d105101c-6f35-4b8c-8f07-93dac0782e91}</UniqueIdentifier>
     </Filter>
-    <Filter Include="UI">
-      <UniqueIdentifier>{974e8dd0-6952-4500-bf20-dc0de5ffadbb}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\UI">
       <UniqueIdentifier>{bd139772-02c9-47e5-be96-2ffeb37291ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\UI">
+      <UniqueIdentifier>{974e8dd0-6952-4500-bf20-dc0de5ffadbb}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -58,16 +58,16 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Window.h">
-      <Filter>UI</Filter>
+      <Filter>Header Files\UI</Filter>
     </ClInclude>
     <ClInclude Include="LoginWindow.h">
-      <Filter>UI</Filter>
+      <Filter>Header Files\UI</Filter>
     </ClInclude>
     <ClInclude Include="LoggerWindow.h">
-      <Filter>UI</Filter>
+      <Filter>Header Files\UI</Filter>
     </ClInclude>
     <ClInclude Include="gui.h">
-      <Filter>UI</Filter>
+      <Filter>Header Files\UI</Filter>
     </ClInclude>
     <ClInclude Include="LoginHandler.h">
       <Filter>Header Files</Filter>
@@ -79,6 +79,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SaveDataHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Mission.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Item.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Shop.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -107,16 +116,10 @@
     <ClCompile Include="SlotData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="InfoWindow.h">
-      <Filter>UI</Filter>
-    </ClCompile>
     <ClCompile Include="LoginWindow.cpp">
       <Filter>Source Files\UI</Filter>
     </ClCompile>
     <ClCompile Include="LoggerWindow.cpp">
-      <Filter>Source Files\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="InfoWindow.cpp">
       <Filter>Source Files\UI</Filter>
     </ClCompile>
     <ClCompile Include="..\imgui\imgui_widgets.cpp">

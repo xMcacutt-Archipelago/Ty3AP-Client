@@ -1,9 +1,25 @@
 #include "pch.h"
 #include "ShopHandler.h"
 
-uintptr_t ShopHandler::bobsCogRequirementArrays[9];
-uintptr_t ShopHandler::OrbRequirementArrays[3];
-static std::string apLogo = "Fe_999_rita";
+int __cdecl ShopHandler::OnGetString(int param_1) {
+	auto state = *(int*)(Core::moduleBase + 0x4C2D80);
+	if (state == 2) {
+        const char* itemname = ShopHandler::GetShopItemName(param_1, true);
+		if (itemname)
+			return (int)itemname;
+	}
+	return getStringFunc(param_1);
+}
+
+std::optional<int> GetItemIdFromStringId(int stringId) {
+	auto data = SaveData::GetData();
+	for (auto itemIndex = 0; itemIndex < data->itemCount; itemIndex++) {
+		auto item = data->items[itemIndex];
+		if (item->titleId == stringId || item->descId == stringId)
+			return item->itemId & 0xFFFF;
+	}
+	return std::nullopt;
+}
 
 static std::map<int, std::string> strIDtoTitleText = {};
 static std::mutex strIDtoTitleTextMutex;
@@ -14,114 +30,23 @@ static std::mutex strIDtoDescTextMutex;
 static std::map<int, std::string> strIDtoImgText = {};
 static std::mutex strIDtoImgTextMutex;
 
-struct itemStrings {
-	int titleId;
-	int descId;
-};
-
 std::list<int64_t> scouteditems;
-static const char* unknown = "Unknown AP Item";
-
-static const std::map <int, itemStrings> shop1Ids =
-{ { 1, {550,551} }, { 2, {552,553} }, { 59, {666,667} },{77, {702,703} },{78, {704,705} },{79, {1117,1118} },{80, {1119,1120} },{81, {1121,1122} },
-	{82, {1123,1124} },{83, {1125,1126} },{84, {1127,1128} },{85, {1129,1130} },{86, {1131,1132} }, { 87, {1133,1134} }, { 88, {1135,1136} } };
-static const std::map <int, itemStrings> shop2Ids =
-{ {8, {564,212} },{9, {566,214} },{18, {196,216} },{11, {570,218} },{12, {572,220} },{13, {574,222} },{14, {576,224} },{26, {1190,1191} } };
-static const std::map <int, itemStrings> shop3Ids =
-{ {15, {191,211} },{16, {193,213} },{17, {195,215} },{10, {568,217} },{19, {199,219} },{20, {201,221} },{21, {203,223} },{22, {205,225} },
-	{23, {206,226} },{24, {207,227} },{25, {1188,1189} } };
-static const std::map <int, itemStrings> shop4Ids = { {5, {558,559} },{6, {560,561} },{7, {562,563} } };
-
-bool ShopHandler::OnItemAvailable(void* itemPtr) {
-	uint8_t* base = static_cast<uint8_t*>(itemPtr);
-	short id = *reinterpret_cast<short*>(base + 0x4);
-	//true means purchaseable
-	return !ArchipelagoHandler::customSaveData->hasBoughtItem(id);
-}
-
-void ShopHandler::SetShopItems(SlotData* slotdata) {
-	int index = 0;
-	SaveData::GetShopItemList(1).forEach([&index, slotdata](ItemStruct& item) {
-		if (item.currencyType == 0) {
-			item.price = slotdata->traderBobPrices[index];
-			if (item.itemId == 78) {
-				API::LogPluginMessage("Changing locked for platinum paw " + std::to_string(item.itemId));
-				item.locked = false;
-				item.requirementsArrayLength = 0;
-			}
-			index++;
-			ShopHandler::GetShopItemName(item.titleId, false);
-		}
-		});
-
-	index = 0;
-	uintptr_t lastitemptr;
-	SaveData::GetShopItemList(1).forEach([&index, slotdata, &lastitemptr](ItemStruct& item) {
-		if (item.currencyType == 2) {
-			lastitemptr = (uintptr_t)&item;
-			item.price = slotdata->cogPrices[index];
-			if (item.itemId > 79) {
-				API::LogPluginMessage("Changing locked for cog stuff " + std::to_string(item.itemId));
-				ShopHandler::bobsCogRequirementArrays[item.itemId - 80] = lastitemptr;
-				item.setItemRequirements((uintptr_t)&ShopHandler::bobsCogRequirementArrays[item.itemId - 80], 1);
-				item.locked = !ArchipelagoHandler::customSaveData->hasBoughtItem(item.itemId - 1);
-			}
-			ShopHandler::GetShopItemName(item.titleId, false);
-			index++;
-		}
-	});
-
-	index = 0;
-	SaveData::GetShopItemList(2).forEach([&index, slotdata](ItemStruct& item) {
-		if (item.currencyType == 0) {
-			item.price = slotdata->rangPrices[index];
-			item.locked = false;
-			index++;
-			ShopHandler::GetShopItemName(item.titleId, false);
-		}
-	});
-
-	index = 0;
-	SaveData::GetShopItemList(3).forEach([&index, slotdata](ItemStruct& item) {
-		if (item.currencyType == 0) {
-			item.price = slotdata->slyPrices[index];
-
-			item.locked = false;
-			index++;
-			ShopHandler::GetShopItemName(item.titleId, false);
-		}
-	});
-
-	index = 0;
-	SaveData::GetShopItemList(4).forEach([&index, slotdata, &lastitemptr](ItemStruct& item) {
-		if (item.currencyType == 1) {
-			item.price = slotdata->orbPrices[index];
-			lastitemptr = (uintptr_t)&item;
-			if (item.itemId > 5) {
-				ShopHandler::OrbRequirementArrays[item.itemId - 6] = lastitemptr;
-				item.setItemRequirements((uintptr_t)&ShopHandler::OrbRequirementArrays[item.itemId - 6], 1);
-				item.locked = !ArchipelagoHandler::customSaveData->hasBoughtItem(item.itemId - 1);
-			}
-			ShopHandler::GetShopItemName(item.titleId, false);
-			index++;
-		}
-	});
-}
-
 const char* ShopHandler::GetShopItemName(int strId, bool hint) {
-	auto itemIdOpt = getItemIdFromString(strId);
+	auto itemIdOpt = GetItemIdFromStringId(strId);
 	if (itemIdOpt.has_value()) {
 		int64_t itemId = static_cast<int64_t>(itemIdOpt.value());
+		if (std::find(validShopItems.begin(), validShopItems.end(), itemId) == validShopItems.end()) {
+			return nullptr;
+		}
 		if (std::find(scouteditems.begin(), scouteditems.end(), itemId) == scouteditems.end()) {
 			std::list<int64_t> newList;
-			newList.push_back(itemId);
+			newList.push_back(0x6900 + itemId);
 			ArchipelagoHandler::ScoutLocations(newList, hint);
-
-			if (hint) {
+			if (hint) 
 				scouteditems.push_back(itemId);
-			}
 		}
 	}
+	
 	{
 		std::lock_guard<std::mutex> lock(strIDtoTitleTextMutex);
 		auto it = strIDtoTitleText.find(strId);
@@ -129,6 +54,7 @@ const char* ShopHandler::GetShopItemName(int strId, bool hint) {
 			return it->second.c_str();
 		}
 	}
+
 	{
 		std::lock_guard<std::mutex> lock(strIDtoDescTextMutex);
 		auto it = strIDtoDescText.find(strId);
@@ -140,79 +66,107 @@ const char* ShopHandler::GetShopItemName(int strId, bool hint) {
 	return nullptr;
 }
 
-const char* ShopHandler::getImagePtr(const std::string& itemname, int flags)
-{
-	API::LogPluginMessage("Lookup");
-	// lookup by item name
-	if (auto it = itemNameToImg.find(itemname); it != itemNameToImg.end())
-		return it->second;
-	API::LogPluginMessage("Check flags");
-	// check flags (priority order)
-	if (flags & 1) return "ap_color"; //progressive
-	if (flags & 2) return "ap_color"; //useful ap_white
-	if (flags & 4) return "ap_color"; //junk ap_black
-
-	// default
-	API::LogPluginMessage("Returning default");
-	return "ap_color";
-}
-
-std::optional<int> getItemIdFromString(int stringId) {
-	const std::map<int, itemStrings>* shops[] = { &shop1Ids, &shop2Ids, &shop3Ids, &shop4Ids };
-
-	for (auto shop : shops) {
-		for (const auto& pair : *shop) {
-			if (pair.second.titleId == stringId || pair.second.descId == stringId) {
-				return pair.first; // return the item ID
-			}
+void ShopHandler::SetShopItems() {
+	auto rangShop = SaveData::FindShopById(Shop::RANG_SHOP);
+	int indexCurrency0 = 0, indexCurrency1 = 0;
+	for (auto itemIndex = 0; itemIndex < rangShop->itemCount; itemIndex++) {
+		auto item = rangShop->items[itemIndex];
+		switch (item->currencyType) {
+		case 0:
+			item->baseCost = 2500;
+			indexCurrency0++;
+			break;
+		case 1:
+			item->baseCost = (indexCurrency1 + 1) * 3;
+			indexCurrency1++;
+			break;
 		}
+		ShopHandler::GetShopItemName(item->titleId, false);
 	}
 
-	return std::nullopt; // not found
+	auto cassopolisShop = SaveData::FindShopById(Shop::CASSOPOLIS);
+	indexCurrency0 = 0;
+	for (auto itemIndex = 0; itemIndex < cassopolisShop->itemCount; itemIndex++) {
+		auto item = cassopolisShop->items[itemIndex];
+		if (item->currencyType == 0) {
+			item->baseCost = 2500;
+			indexCurrency0++;
+		}
+		ShopHandler::GetShopItemName(item->titleId, false);
+	}
+
+	auto mobileHQ = SaveData::FindShopById(Shop::MOBILE_HQ);
+	int indexCurrency2 = 0, indexCurrency3 = 0;
+	indexCurrency0 = 0;
+	for (auto itemIndex = 0; itemIndex < mobileHQ->itemCount; itemIndex++) {
+		auto item = mobileHQ->items[itemIndex];
+		switch (item->currencyType) {
+		case 0:
+			item->baseCost = 2500;
+			indexCurrency0++;
+			break;
+		case 2:
+			item->baseCost = (indexCurrency2 + 1) * 2;
+			indexCurrency2++;
+			break;
+		case 3:
+			item->baseCost = (indexCurrency3 + 1) * 7;
+			indexCurrency3++;
+			break;
+		}
+		ShopHandler::GetShopItemName(item->titleId, false);
+	}
+
+	auto secretShop = SaveData::FindShopById(Shop::SECRET_SHOP);
+	indexCurrency0 = 0;
+	for (auto itemIndex = 0; itemIndex < secretShop->itemCount; itemIndex++) {
+		auto item = secretShop->items[itemIndex];
+		if (item->currencyType == 0) {
+			item->baseCost = 5000;
+			indexCurrency0++;
+		}
+		ShopHandler::GetShopItemName(item->titleId, false);
+	}
 }
 
-void ShopHandler::FillShopItemNames(const std::list<APClient::NetworkItem>& items) {
-	for (const APClient::NetworkItem& item : items) {
-		itemStrings* strs = nullptr;
+void ShopHandler::FillShopItemNames(const std::list<APClient::NetworkItem>& items)
+{
+	for (const APClient::NetworkItem& netItem : items) {
+		auto itemId = netItem.location & 0xFF;
+		ItemStruct* shopItem = SaveData::FindItemById(itemId);
 
-		auto findStrings = [&](const std::map<int, itemStrings>& shopMap) -> itemStrings* {
-			auto it = shopMap.find(item.location);
-			return (it != shopMap.end()) ? const_cast<itemStrings*>(&it->second) : nullptr;
-			};
-
-		if (!(strs = findStrings(shop1Ids)) &&
-			!(strs = findStrings(shop2Ids)) &&
-			!(strs = findStrings(shop3Ids)) &&
-			!(strs = findStrings(shop4Ids))) {
-			continue; // Skip if not a known AP shop item
+		if (!shopItem) {
+			API::LogPluginMessage("Invalid id: " + std::to_string(itemId));
+			continue;
 		}
 
 		{
 			std::lock_guard<std::mutex> lock(strIDtoTitleTextMutex);
-			strIDtoTitleText[strs->titleId] = ArchipelagoHandler::GetItemName(item.item, item.player);
+			strIDtoTitleText[shopItem->titleId] = ArchipelagoHandler::GetItemName(netItem.item, netItem.player);
 		}
+
 		{
 			std::lock_guard<std::mutex> lock(strIDtoDescTextMutex);
-			strIDtoDescText[strs->descId] = ArchipelagoHandler::GetItemDesc(item.player);
+			strIDtoDescText[shopItem->descId] = ArchipelagoHandler::GetItemDesc(netItem.player);
 		}
-		API::LogPluginMessage("Find Item");
-		ItemStruct* shopItem = SaveData::findItemByID((int)item.location);
-		API::LogPluginMessage("Check item");
-		if (shopItem) {
-			API::LogPluginMessage("Set Item");
-			shopItem->ShopIconNameString = const_cast<char*>(ShopHandler::getImagePtr(ArchipelagoHandler::GetItemName(item.item, item.player), item.flags));
-			API::LogPluginMessage("Set Item Image");
-		}
+
+		auto itemName = ArchipelagoHandler::GetItemName(netItem.item, netItem.player);
+		strcpy_s(
+			reinterpret_cast<char*>(shopItem->shopIconNamePtr),
+			0x20,
+			ShopHandler::GetImageName(itemName, netItem.flags)
+		);
+		if (shopItem->currencyType == 0)
+			shopItem->baseCost = ShopHandler::GetCost(netItem.flags);
 	}
 }
 
 void ShopHandler::CollectItem(int shopId, int itemId)
 {
-	LinkedList<ItemStruct> items = SaveData::GetShopItemList(shopId);
-	auto item = SaveData::findItemByID(items, itemId);
+	auto item = SaveData::FindItemById(itemId);
 	if (item) {
 		API::LogPluginMessage("item has value: " + std::to_string(itemId));
-		item->purchased = true;
+		item->maxNumPurchased = 0;
 	}
 	else {
 		API::LogPluginMessage("No Item with id " + std::to_string(itemId));

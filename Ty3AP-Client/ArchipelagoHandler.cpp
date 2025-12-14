@@ -28,10 +28,10 @@ void ArchipelagoHandler::DisconnectAP() {
 	polling = false;
 	ap_connect_sent = false;
 	ap_connected = false;
-	if (GameState::IsOnMenu())
-		GameHandler::SetLoadActive(false);
-	else
+	if (GameState::IsInGame())
 		GameState::ForceMainMenu();
+	else
+		LoginHandler::DisableLoadButtons();
 }
 
 void ArchipelagoHandler::ConnectAP(LoginWindow* login)
@@ -73,13 +73,27 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
 			}
 		}
 
+		if (data.find("StoryMissionsToGoal") != data.end()) {
+			slotdata->storyMissionsToGoal = data["StoryMissionsToGoal"].get<int>() == 1;
+		}
+
+		if (data.find("BunyipMissionsToGoal") != data.end()) {
+			slotdata->bunyipMissionsToGoal = data["BunyipMissionsToGoal"].get<int>() == 1;
+		}
+
+		if (data.find("GunyipMissionsToGoal") != data.end()) {
+			slotdata->gunyipMissionsToGoal = data["GunyipMissionsToGoal"].get<int>() == 1;
+		}
+
+		if (data.find("RaceMissionsToGoal") != data.end()) {
+			slotdata->raceMissionsToGoal = data["RaceMissionsToGoal"].get<int>() == 1;
+		}
+
 		ap->ConnectUpdate(false, 0b111, true, tags);
 		ap->StatusUpdate(APClient::ClientStatus::PLAYING);
 		seed = ap->get_seed();
 		slotName = ap->get_slot();
-		ArchipelagoHandler::LoadSaveData();
-		GameHandler::EnableLoadButtons();
-		GameHandler::SetupOnConnect();
+		LoginHandler::EnableLoadButtons();
 	});
 	ap->set_slot_disconnected_handler([login]() { 
 		LoggerWindow::Log("Slot disconnected");
@@ -87,10 +101,10 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
 		SetAPStatus("Disconnected", 1);
 		ap_connect_sent = false;
 		ap_connected = false;
-		if (GameState::IsOnMenu())
-			GameHandler::SetLoadActive(false);
-		else
+		if (GameState::IsInGame())
 			GameState::ForceMainMenu();
+		else
+			LoginHandler::DisableLoadButtons();
 	});
 	ap->set_slot_refused_handler([login](const std::list<std::string>& errors) {
 		for (const auto& error : errors) {
@@ -122,7 +136,7 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
 		}
 	});
 	ap->set_location_info_handler([](const std::list<APClient::NetworkItem>& items) {
-		ItemHandler::FillShopItemNames(items);
+		ShopHandler::FillShopItemNames(items);
 	});
 	ap->set_bounced_handler([](const json& cmd) {
 		auto tagsIt = cmd.find("tags");
@@ -137,7 +151,8 @@ void ArchipelagoHandler::ConnectAP(LoginWindow* login)
 						std::string source = data["source"].is_string() ? data["source"].get<std::string>().c_str() : "???";
 						std::string cause = data["cause"].is_string() ? data["cause"].get<std::string>().c_str() : "???";
 						LoggerWindow::Log("[color = FFFFFFFF]" + cause);
-						GameHandler::KillTy();
+						//GameHandler::KillTy(); 
+						//TODO Deathlink
 					}
 				}
 				else {
@@ -152,6 +167,25 @@ void ArchipelagoHandler::SendLocation(int64_t locationId) {
 	std::list<int64_t> check;
 	check.push_back(locationId);
 	ap->LocationChecks(check);
+}
+
+bool ArchipelagoHandler::IsLocationChecked(int64_t locationId) {
+	const auto& checked = ap->get_checked_locations();
+	return std::find(checked.begin(), checked.end(), locationId) != checked.end();
+}
+
+int ArchipelagoHandler::CountLocationsChecked(const std::list<int64_t>& locationIds)
+{
+	const auto& checked = ap->get_checked_locations();
+	std::size_t count = 0;
+
+	for (int64_t id : locationIds) {
+		if (std::find(checked.begin(), checked.end(), id) != checked.end()) {
+			++count;
+		}
+	}
+
+	return count;
 }
 
 void ArchipelagoHandler::Release() {
@@ -199,10 +233,6 @@ const std::vector<std::string> deathCauses{
 
 void ArchipelagoHandler::SetAPStatus(std::string status, char important) {
 	API::LogPluginMessage("AP status: " + status);
-}
-
-bool ArchipelagoHandler::LoadSaveData() {
-	return SaveDataHandler::LoadSaveData(seed, slot);
 }
 
 std::string GetRandomCause() {

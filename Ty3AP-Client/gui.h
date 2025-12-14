@@ -2,7 +2,6 @@
 #include "pch.h"
 #include "Window.h"
 #include "LoginWindow.h"
-#include "InfoWindow.h"
 #include "LoggerWindow.h"
 #include <cstdio>
 #include "windows.h"

@@ -27,12 +27,15 @@
     <ClInclude Include="GameHandler.h" />
     <ClInclude Include="gui.h" />
     <ClInclude Include="Hooks.h" />
+    <ClInclude Include="Item.h" />
     <ClInclude Include="ItemHandler.h" />
     <ClInclude Include="LoggerWindow.h" />
     <ClInclude Include="LoginHandler.h" />
     <ClInclude Include="LoginWindow.h" />
+    <ClInclude Include="Mission.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="SaveDataHandler.h" />
+    <ClInclude Include="Shop.h" />
     <ClInclude Include="ShopHandler.h" />
     <ClInclude Include="SlotData.h" />
     <ClInclude Include="Version.h" />
@@ -67,8 +70,6 @@
     <ClCompile Include="GameHandler.cpp" />
     <ClCompile Include="gui.cpp" />
     <ClCompile Include="Hooks.cpp" />
-    <ClCompile Include="InfoWindow.cpp" />
-    <ClCompile Include="InfoWindow.h" />
     <ClCompile Include="ItemHandler.cpp" />
     <ClCompile Include="LoggerWindow.cpp" />
     <ClCompile Include="LoginHandler.cpp" />
@@ -148,6 +149,8 @@
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <VcpkgUseStatic>true</VcpkgUseStatic>
+    <VcpkgTriplet>
+    </VcpkgTriplet>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -174,7 +177,7 @@
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\TygerMemory2\TygerMemory2;$(ProjectDir)..\wswrap\include;$(ProjectDir)..\websocketpp;$(ProjectDir)..\apclientpp;$(ProjectDir)..\imgui\backends;$(ProjectDir)..\imgui;$(ProjectDir)..\imgui\misc\cpp</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\TygerMemory3\TygerMemory3;$(ProjectDir)..\wswrap\include;$(ProjectDir)..\websocketpp;$(ProjectDir)..\apclientpp;$(ProjectDir)..\imgui\backends;$(ProjectDir)..\imgui;$(ProjectDir)..\imgui\misc\cpp</AdditionalIncludeDirectories>
       <ShowIncludes>true</ShowIncludes>
       <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
@@ -184,12 +187,12 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ModuleDefinitionFile>Source.def</ModuleDefinitionFile>
-      <AdditionalDependencies>TygerMemory2.lib;libssl.lib;libcrypto.lib;crypt32.lib;ws2_32.lib;opengl32.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>TygerMemory3.lib;libssl.lib;libcrypto.lib;crypt32.lib;ws2_32.lib;opengl32.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(ProjectDir)..\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <EnableUAC>false</EnableUAC>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(OutDir)$(ProjectName).dll" "C:\Program Files (x86)\Steam\steamapps\common\TY the Tasmanian Tiger 2\Plugins\$(ProjectName).dll"</Command>
+      <Command>copy "$(OutDir)$(ProjectName).dll" "C:\Program Files (x86)\Steam\steamapps\common\TY the Tasmanian Tiger 3\Plugins\$(ProjectName).dll"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

@@ -49,16 +49,17 @@ void SaveDataHandler::LoadAPSaveFile() {
 
 		read_json_file(filePath + ".json");
 
-		*(DWORD*)(Core::moduleBase + 0x4CBD78 + 0x238) = 1;
+		*(DWORD*)(Core::moduleBase + 0xEB99A8 + 0x238) = 1;
 
 		g_SaveCallback.active = true;
-		g_SaveCallback.esi = Core::moduleBase + 0x4CBD78;
+		g_SaveCallback.esi = Core::moduleBase + 0xEB99A8;
 		g_SaveCallback.framesRemaining = 5;
 		g_SaveCallback.callback = []() {
-			using CallbackFn = int(__thiscall*)(void* thisptr, void* arg1, int arg2);
-			CallbackFn fn = (CallbackFn)(Core::moduleBase + 0x377AE0);
 
-			void* thisptr = (void*)(Core::moduleBase + 0x4CBD78);
+			using CallbackFn = int(__thiscall*)(void* thisptr, void* arg1, int arg2);
+			CallbackFn fn = (CallbackFn)(Core::moduleBase + 0x3477C0);
+
+			void* thisptr = (void*)(Core::moduleBase + 0xEB99A8);
 
 			uint8_t dataBuffer[] = {
 				0x46, 0xC1, 0xF7, 0xCD,
@@ -77,7 +78,7 @@ void SaveDataHandler::LoadAPSaveFile() {
 
 			// Call the function
 			int result = fn(thisptr, dataBuffer, arg2);
-			};
+		};
 
 	}
 	else {
@@ -107,15 +108,21 @@ int SaveDataHandler::SaveFile(const char* filename, void* data, int size) {
 }
 
 void SaveDataHandler::write_json_file(const std::string& filename) {
-	json j;
+	nlohmann::json j;
 
 	// Populate the JSON object
 	j["LastRecievedIndex"] = ArchipelagoHandler::customSaveData->pLastReceivedIndex;
-	j["CogCount"] = SaveData::GetData()->CogCollected;
-	j["OrbCount"] = SaveData::GetData()->OrbCollected;
+	j["BerryCount"] = SaveData::GetData()->berriesCollected;
+	j["OrbCount"] = SaveData::GetData()->orbsCollected;
+	j["BilbyCount"] = SaveData::GetData()->bilbiesCollected;
 	j["ShopData"] = ArchipelagoHandler::customSaveData->ItemMap;
-	j["UnlockedParkingBays"] = ArchipelagoHandler::customSaveData->UnlockedParkingPads;
-	j["UnlockedBarriers"] = ArchipelagoHandler::customSaveData->UnlockedBarriers;
+	j["UnlockedDuke"] = ArchipelagoHandler::customSaveData->hasUnlockedDuke;
+	j["UnlockedKakaboom"] = ArchipelagoHandler::customSaveData->hasUnlockedKakaboom;
+	j["UnlockedBasin"] = ArchipelagoHandler::customSaveData->hasUnlockedBasin;
+	j["UnlockedCinder"] = ArchipelagoHandler::customSaveData->hasUnlockedCinder;
+	j["HasShadowChassis"] = ArchipelagoHandler::customSaveData->hasShadowChassis;
+	j["ShadowStones"] = ArchipelagoHandler::customSaveData->shadowStoneCount;
+	j["HasGauntlet"] = ArchipelagoHandler::customSaveData->hasGauntlet;
 
 	// Write to file
 	std::ofstream file(filename);
@@ -134,7 +141,7 @@ void SaveDataHandler::read_json_file(const std::string& filename) {
 		return;
 	}
 
-	json j;
+	nlohmann::json j;
 	file >> j;
 
 	// Access data
@@ -143,16 +150,21 @@ void SaveDataHandler::read_json_file(const std::string& filename) {
 	ArchipelagoHandler::customSaveData->orbCount = j["OrbCount"];
 	ArchipelagoHandler::customSaveData->bilbyCount = j["BilbyCount"];
 	ArchipelagoHandler::customSaveData->ItemMap = j["ShopData"].get<std::map<int, bool>>();
+	ArchipelagoHandler::customSaveData->hasUnlockedDuke = j["UnlockedDuke"] == 1;
+	ArchipelagoHandler::customSaveData->hasUnlockedKakaboom = j["UnlockedKakaboom"] == 1;
+	ArchipelagoHandler::customSaveData->hasUnlockedBasin = j["UnlockedBasin"] == 1;
+	ArchipelagoHandler::customSaveData->hasUnlockedCinder = j["UnlockedCinder"] == 1;
+	ArchipelagoHandler::customSaveData->hasShadowChassis = j["HasShadowChassis"] == 1;
+	ArchipelagoHandler::customSaveData->shadowStoneCount = j["ShadowStones"];
+	ArchipelagoHandler::customSaveData->hasGauntlet = j["HasGauntlet"] == 1;
 }
 
 bool SaveDataHandler::hasRunSetup = false;
 void SaveDataHandler::RunLoadSetup(SlotData* slotdata) {
-	SaveData::GetData()->BerryCollected = ArchipelagoHandler::customSaveData->berryCount;
-	SaveData::GetData()->OrbCollected = ArchipelagoHandler::customSaveData->orbCount;
-	SaveData::GetData()->BilbyCollected = ArchipelagoHandler::customSaveData->bilbyCount;
-	ShopHandler::SetShopItems(slotdata);
-
+	SaveData::GetData()->berriesCollected = ArchipelagoHandler::customSaveData->berryCount;
+	SaveData::GetData()->orbsCollected =    ArchipelagoHandler::customSaveData->orbCount;
+	SaveData::GetData()->bilbiesCollected = ArchipelagoHandler::customSaveData->bilbyCount;
+	ShopHandler::SetShopItems();
 	ItemHandler::HandleStoredItems();
-
 	hasRunSetup = true;
 }

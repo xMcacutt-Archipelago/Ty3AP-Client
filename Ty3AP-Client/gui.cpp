@@ -9,13 +9,7 @@ std::vector<std::unique_ptr<Window>> GUI::windows;
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 bool GUI::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     if (msg == WM_KEYDOWN && wParam == VK_F3) {
-        for (auto& window : windows) {
-            if (auto Iwindow = dynamic_cast<InfoWindow*>(window.get())) {
-                Iwindow->ToggleVisibility();
-                API::LogPluginMessage("Toggle InfoWindow window.");
-                break;
-            }
-        }
+        GameHandler::KillTy();
     }
     if (msg == WM_KEYDOWN && wParam == VK_F2) {
         for (auto& window : windows) {
@@ -94,7 +88,6 @@ void GUI::Initialize() {
     ImGui_ImplOpenGL3_Init();
     ImGui_ImplWin32_InitForOpenGL(API::GetTyWindowHandle());
 
-    windows.push_back(std::make_unique<InfoWindow>());
     windows.push_back(std::make_unique<LoginWindow>());
     windows.push_back(std::make_unique<LoggerWindow>());
 

@@ -3,32 +3,27 @@
 
 void LoginHandler::EnableLoadButtons()
 {
-	if (IsInGame()) {
-		return;
-	}
-	auto buttongroup = MKUI::FindChildElementByName(MKUI::GetMainMenu(), "MainMenuButtons");
-	if (buttongroup == nullptr) {
-		API::LogPluginMessage("Button group does not exist here");
-		return;
+	while (GameState::IsInGame()) {
+		
 	}
 	if (SaveDataHandler::doesSaveExist()) {
-		UIElementStruct* loadgame = MKUI::FindChildElementByName(buttongroup, "LoadGame");
-		if (loadgame != nullptr) {
-			loadgame->interactable = true;
-			loadgame->enabled = true;
-			loadgame->Red = 0.63f;
-			loadgame->Blue = 0.63f;
-			loadgame->Green = 0.63f;
+		auto loadGame = MKUI::FindElementByPath("MainMenu/MainMenuButtons/LoadGame");
+		if (loadGame != nullptr) {
+			loadGame->interactable = true;
+			loadGame->enabled = true;
+			loadGame->Red = 0.63f;
+			loadGame->Blue = 0.63f;
+			loadGame->Green = 0.63f;
 		}
 	}
 	else {
-		UIElementStruct* newgame = MKUI::FindChildElementByName(buttongroup, "NewGame");
-		if (newgame != nullptr) {
-			newgame->interactable = true;
-			newgame->enabled = true;
-			newgame->Red = 0.63f;
-			newgame->Blue = 0.63f;
-			newgame->Green = 0.63f;
+		auto newGame = MKUI::FindElementByPath("MainMenu/MainMenuButtons/NewGame");
+		if (newGame != nullptr) {
+			newGame->interactable = true;
+			newGame->enabled = true;
+			newGame->Red = 0.63f;
+			newGame->Blue = 0.63f;
+			newGame->Green = 0.63f;
 		}
 	}
 }
@@ -36,27 +31,28 @@ void LoginHandler::EnableLoadButtons()
  
 void LoginHandler::DisableLoadButtons()
 {
-	auto buttongroup = MKUI::FindChildElementByName(MKUI::GetMainMenu(), "MainMenuButtons");
-	if (buttongroup == nullptr) {
-		return;
+	while (GameState::IsInGame()) {
+
 	}
-	UIElementStruct* loadgame = MKUI::FindChildElementByName(buttongroup, "LoadGame");
-	if (loadgame != nullptr) {
-		loadgame->interactable = false;
-		loadgame->enabled = false;
-		loadgame->currentlySelected = false;
-		loadgame->Red = 0.4f;
-		loadgame->Blue = 0.4f;
-		loadgame->Green = 0.4f;
-		API::LogPluginMessage("Disable load game");
+	if (!ArchipelagoHandler::ap_connected) {
+		auto loadGame = MKUI::FindElementByPath("MainMenu/MainMenuButtons/LoadGame");
+		if (loadGame != nullptr) {
+			loadGame->interactable = false;
+			loadGame->enabled = false;
+			loadGame->currentlySelected = false;
+			loadGame->Red = 0.4f;
+			loadGame->Blue = 0.4f;
+			loadGame->Green = 0.4f;
+			API::LogPluginMessage("Disable load game");
+		}
 	}
-	UIElementStruct* newgame = MKUI::FindChildElementByName(buttongroup, "NewGame");
-	if (newgame != nullptr) {
-		newgame->interactable = false;
-		newgame->enabled = false;
-		newgame->currentlySelected = false;
-		newgame->Red = 0.4f;
-		newgame->Blue = 0.4f;
-		newgame->Green = 0.4f;
+	auto newGame = MKUI::FindElementByPath("MainMenu/MainMenuButtons/NewGame");
+	if (newGame != nullptr) {
+		newGame->interactable = false;
+		newGame->enabled = false;
+		newGame->currentlySelected = false;
+		newGame->Red = 0.4f;
+		newGame->Blue = 0.4f;
+		newGame->Green = 0.4f;
 	}
 }

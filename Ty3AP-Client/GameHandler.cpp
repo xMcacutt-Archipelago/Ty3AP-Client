@@ -2,9 +2,6 @@
 #include "GameHandler.h"
 using nlohmann::json;
 
-typedef void(__thiscall* StateTransitionFunc)(void* thisPtr, int firstArg, int secondArg);
-StateTransitionFunc StateTransitionOrigin = nullptr;
-
 void GameHandler::Initialize()
 {
 	MH_Uninitialize();
@@ -13,7 +10,7 @@ void GameHandler::Initialize()
 	MH_EnableHook(MH_ALL_HOOKS);
 }
 
-void GameHandler::SetToNoOperation(void* address, size_t size) {
+void GameHandler::SetToNoOperation(uintptr_t* address, size_t size) {
 	DWORD oldProtect;
 	VirtualProtect(address, size, PAGE_EXECUTE_READWRITE, &oldProtect);
 	memset(address, 0x90, size);
@@ -21,7 +18,7 @@ void GameHandler::SetToNoOperation(void* address, size_t size) {
 	FlushInstructionCache(GetCurrentProcess(), address, size);
 }
 
-void GameHandler::SetToJmp(void* address) {
+void GameHandler::SetToJmp(uintptr_t* address) {
 	DWORD oldProtect;
 	VirtualProtect(address, 1, PAGE_EXECUTE_READWRITE, &oldProtect);
 	memset(address, 0xEB, 1);
@@ -29,16 +26,71 @@ void GameHandler::SetToJmp(void* address) {
 	FlushInstructionCache(GetCurrentProcess(), address, 1);
 }
 
+void GameHandler::KillTy()
+{
+	if (GameState::IsInGame()) {
+		auto transitionFunc = (StateTransitionFunc)(Core::moduleBase + 0x1608C0);
+		auto ty = MKObject::GetMKObject(204);
+		if (!ty) {
+			return;
+		}
+		auto* tyStateHandler = (uintptr_t*)(ty + 0x530);
+		int stateid = 0xe;
+		int source = 9000;
+		transitionFunc(tyStateHandler, stateid, source);
+	}
+}
+
 void GameHandler::OnChunkLoaded() {
+	if (auto rescueJuliusDoor = MKObject::GetMKObject(90284)) {
+		auto shouldOpen = SaveData::FindMissionById(Mission::KARLOS_MISSION)->missionState != (int)MissionState::UNAVAILABLE;
+		auto isOpen = *(int*)(rescueJuliusDoor + 0x168) < 3;
+		if (shouldOpen != isOpen)
+			*(int*)(rescueJuliusDoor + 0x16C) = shouldOpen ? 2 : 4;
+	}
+	if (auto cinderCanyonDoor = MKObject::GetMKObject(90345)) {
+		auto shouldOpen = SaveData::FindMissionById(Mission::BROWN_KIWI_DOWN)->missionState != (int)MissionState::UNAVAILABLE;
+		auto isOpen = *(int*)(cinderCanyonDoor + 0x168) < 3;
+		if (shouldOpen != isOpen)
+			*(int*)(cinderCanyonDoor + 0x16C) = shouldOpen ? 2 : 4;
+	}
 	API::LogPluginMessage("OnChunkLoaded");
+}
+
+int __stdcall GameHandler::CanActivateMission(uintptr_t* missionPtr)
+{
+	auto const* mission = (MissionStruct*)(reinterpret_cast<std::byte*>(missionPtr));
+	if (int id = mission->missionId & 0xffff; gameActiveMissions.end() != std::find(gameActiveMissions.begin(), gameActiveMissions.end(), id)) {
+		API::LogPluginMessage("CanActivateMission: " + std::to_string(id) + " allowed");
+		return 1;
+	}
+	return 0;
 }
 
 void GameHandler::OnGameLoaded()
 {
 	API::LogPluginMessage("GameLoaded");
+	SaveDataHandler::RunLoadSetup(ArchipelagoHandler::slotdata);
+	for (auto mission : GameHandler::autoActiveMissions) {
+		auto missionState = SaveData::FindMissionById(mission)->missionState;
+		if (missionState == MissionState::UNAVAILABLE) {
+			SaveData::FindMissionById(mission)->missionState = MissionState::AVAILABLE;
+		}
+	}
 }
 
 void GameHandler::OnMenuLoaded()
 {
 	API::LogPluginMessage("MenuLoaded");
+	LoginHandler::DisableLoadButtons();
+}
+
+void __fastcall GameHandler::OnDeath(uintptr_t* tyPtr, int edx, int state, int source) {
+	if (source != 9000 && state == 0xe) {
+		if (!ArchipelagoHandler::slotdata->deathlink)
+			return stateTransitionFunc(tyPtr, state, source);
+		API::LogPluginMessage(std::to_string(source));
+		ArchipelagoHandler::SendDeath();
+	}
+	stateTransitionFunc(tyPtr, state, source);
 }
