@@ -4,7 +4,7 @@ setlocal
 :: Define source files
 set FILE1=mod_info.json
 set FILE2=favico.ico
-set FILE3=Release\Ty2AP-Client.dll
+set FILE3=Release\Ty3AP-Client.dll
 set FILE4=Patch_PC.rkv
 
 :: Define destination directory
