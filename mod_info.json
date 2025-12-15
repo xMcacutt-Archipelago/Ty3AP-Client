@@ -7,14 +7,14 @@
     {
       "dep_name": "TygerMemory3",
       "dep_version": "1.0.0",
-      "dep_url": "https://github.com/xMcacutt/TygerMemory3/releases/download/v1.0.0/TygerMemory3.dll"
+      "dep_url": "https://github.com/xMcacutt/TygerMemory3/releases/download/1.0.0/TygerMemory3.dll"
     }
   ],
   "conflicts": [],
   "author": "xMcacutt",
   "download_url": "https://github.com/xMcacutt-Archipelago/Ty3AP-Client/releases/latest/download/Ty3AP-Client.zip",
   "icon_url": "https://raw.githubusercontent.com/xMcacutt-Archipelago/Ty1AP-Client/refs/heads/master/favico.ico",
-  "last_updated": "2025-12-14",
+  "last_updated": "2025-12-15",
   "website": "https://github.com/xMcacutt-Archipelago/Ty3AP-Client?tab=readme-ov-file#ty-the-tasmanian-tiger-3---archipelago-client-plugin",
   "games": [ "Ty 3" ]
 }
