@@ -1,18 +1,18 @@
-# Ty The Tasmanian Tiger 2 - Archipelago Client Plugin
+# Ty The Tasmanian Tiger 3 - Archipelago Client Plugin
 
-For the AP world see [Ty 2 AP World](https://github.com/FyreDay/Archipelago-TyTheTasmanianTiger2/releases/latest)
+For the AP world see [Ty 3 AP World](https://github.com/xMcacutt-Archipelago/Archipelago-TyTheTasmanianTiger3/releases/latest)
 
 ### Manual Installation
 #### Requirements:
-- [Latest Release](https://github.com/FyreDay/Ty2AP-Client/releases/latest)
+- [Latest Release](https://github.com/xMcacutt-Archipelago/Ty3AP-Client/releases/latest)
 
 - [TygerFramework](https://github.com/ElusiveFluffy/TygerFramework/releases/latest)
 
-- [TygerMemory 2](https://github.com/FyreDay/TygerMemory2) VERSION 1.0.2+
+- [TygerMemory 2](https://github.com/xMcacutt/TygerMemory3) VERSION 1.0.0+
 
 1. Follow the [Tyger Framework](https://github.com/ElusiveFluffy/TygerFramework/releases/latest) Setup guide
-2. Add the Ty2 AP Client dll to your plugins directory that should have been created when installing TygerFramework.
-3. Put [TygerMemory 2](https://github.com/FyreDay/TygerMemory2/releases) dll in the Dependencies folder inside the Plugins folder
+2. Add the Ty3 AP Client dll to your plugins directory that should have been created when installing TygerFramework.
+3. Put [TygerMemory 3](https://github.com/xMcacutt/TygerMemory3/releases) dll in the Dependencies folder inside the Plugins folder
 
 Once you launch the game, the client should be up and running.
 
@@ -26,55 +26,49 @@ To Login, Enter the server with the port, the password, and the slot and press c
 
 ## Functionality
 ### Goal
-The goal is to complete a number of missions and then go and beat up Cass.
+The goal is to complete a number of missions and defeat the Quinking.
 
 ### Checks
-#### "Collectables"
-- Platinum cogs
+#### Collectibles
+- Gooboo Berries
 - Kromium Orbs
 - Steves
-- Disguised Frills
+- Bilbies
 - Picture Frames
 
 #### Missions
-Every mission is a check.
+Every mission is a check. Each mission falls into one of four categories: Story, Race, Bunyip, and Gunyip.
+The number of missions required for the Quinking to becomes available depends on your yaml settings.
 
 #### Shops
-Each shop has random items with random prices. Special Currency shops must be purchused in a set order to prevent softlocks in the randomizer
+Each shop has random items with random prices.
+Special currencies spent at shops will not be deducted meaning you never softlock buying the wrong item.
 
 ### Items
 #### Rangs
-Each rang can be an item OR Progressive rangs in the fassion below
-  - Progressive Boomerang: multirang -> megarang -> omegarang
-  - Progressive Frostyrang: frostyrang -> Freezerang
-  - Progressive Flamerang: flamerang -> lavarang
-  - Progressive Flamerang: flamerang -> lavarang
-  - Progressive Lasharang: lasharang -> warparang
-  - Progressive Infrarang: infrarang -> X-Rang
-  - Progressive Smasharang: craftyrang -> smasharang -> Kaboomerang -> deadlyrang -> doomerang (craftrang can break crates, but not smash open walls)
-  - Camerarang
+Each chassis is its own item. There are also a set number of rang stones in the pool.
 
-#### Parking Bays
-The Parking bays that allow you to get out of Shazza's Fourbie are locked until you get sent the parking bay
+### Barriers
+There are five main barriers throughout the apworld
+1. Crabmersible - Unblocks the fence and allows you to drive around Southern Rivers
+2. Sly - Unlocks every bunyip level in Southern Rivers
+3. Duke - Unlocks every gunyip level in Southern Rivers and is a requirement for Kaka Boom Island and Cinder Canyon
+4. Karlos - Unlocks every battle arena in the game
+5. Southern Rivers Gate - Unblocks the entrance to the second overworld and spawns the portal to Cassopolis in new Burramudgee
+
+#### Levels
+Each of the five levels that are played as Ty will require their specific level check to become accessible.
 
 #### Other
-- Progressive Health Paw
-- Bunyip Keys
 - Item Maps
-- Platinum cogs
+- Gooboo Berries
+- Bilbies
 - Kromium Orbs
+- Bunyip Upgrades
 
 #### Junk
 - Opals bags
+- Heal
 
 ## Credits
-Thanks to xMcatutt and Dashiswag92 for being resources during development
-
-Thanks to all the testers:
- - xMcatutt
- - Dashiswag92
- - Bored_Banana
- - DrFizzles
- - JacobMIX
- - Skeleman588
-
+Thanks to Fyreday for the work done on Ty2 which made this implementation much, much easier and Dashiswag92 for the apworld and other assorted development support.

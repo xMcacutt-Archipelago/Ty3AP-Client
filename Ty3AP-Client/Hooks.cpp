@@ -242,6 +242,7 @@ void Hooks::SetupHooks() {
 	// Prevent found item increment
 	GameHandler::SetToNoOperation((uintptr_t*)(Core::moduleBase + 0x18bc53), 3);
 	GameHandler::SetToNoOperation((uintptr_t*)(Core::moduleBase + 0x139FF6), 3);
+	GameHandler::SetToNoOperation((uintptr_t*)(Core::moduleBase + 0x13A006), 4);
 
 	// Prevent ever adding to the spent count of non-opal currencies
 	GameHandler::SetToNoOperation((uintptr_t*)(Core::moduleBase + 0x1db72d), 6);

@@ -18,6 +18,14 @@ void TickBeforeGame(float deltaSeconds) {
             SaveDataHandler::g_SaveCallback.active = false;
         }
     }
+
+    auto stoneConfigBaseAddr = *(uintptr_t*)(Core::moduleBase + 0x4C330C);
+    if (stoneConfigBaseAddr == 0)
+        return;
+    auto chronoStonesLoaded = *(int*)(stoneConfigBaseAddr + 0xBC);
+
+    auto speed = 600.0f + chronoStonesLoaded * 50.0f;
+    Core::SetReadOnlyValue((uintptr_t*)(Core::moduleBase + 0x15FF76), &speed, 4);
 }
 
 void OnTyInit() {

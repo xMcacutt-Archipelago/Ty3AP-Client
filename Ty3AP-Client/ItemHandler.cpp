@@ -211,15 +211,17 @@ void ItemHandler::HandleItem(APClient::NetworkItem item)
     case Ty3Item::Opals1k:
         ItemHandler::AddOpals(1000);
         break;
-
     case Ty3Item::FullHeal:
         *(int*)(Core::moduleBase + 0x48D3BC) = 4;
         break;
     }
 
 	std::string filePath = "./Saves/" + ArchipelagoHandler::GetSaveIdentifier();
-
 	SaveDataHandler::write_json_file(filePath + ".json");
+    
+    *(int*)(Core::moduleBase + 0x490400) = 0;
+    void (*save)() = reinterpret_cast<void(*)()>(Core::moduleBase + 0x2527A0);
+    save();
 }
 
 void ItemHandler::HandleStoredItems()

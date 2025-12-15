@@ -8,9 +8,6 @@ std::vector<std::unique_ptr<Window>> GUI::windows;
 
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 bool GUI::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
-    if (msg == WM_KEYDOWN && wParam == VK_F3) {
-        GameHandler::KillTy();
-    }
     if (msg == WM_KEYDOWN && wParam == VK_F2) {
         for (auto& window : windows) {
             if (auto Lwindow = dynamic_cast<LoginWindow*>(window.get())) {

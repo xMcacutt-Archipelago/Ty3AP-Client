@@ -54,6 +54,12 @@ void GameHandler::OnChunkLoaded() {
 		if (shouldOpen != isOpen)
 			*(int*)(cinderCanyonDoor + 0x16C) = shouldOpen ? 2 : 4;
 	}
+	if (auto cassopolisDoor = MKObject::GetMKObject(60421)) {
+		auto shouldOpen = SaveData::FindMissionById(Mission::CRAB_MISSION)->missionState != (int)MissionState::UNAVAILABLE;
+		auto isOpen = *(int*)(cassopolisDoor + 0x168) < 3;
+		if (shouldOpen != isOpen)
+			*(int*)(cassopolisDoor + 0x16C) = shouldOpen ? 2 : 4;
+	}
 	API::LogPluginMessage("OnChunkLoaded");
 }
 
