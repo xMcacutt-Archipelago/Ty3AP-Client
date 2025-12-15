@@ -8,7 +8,7 @@ For the AP world see [Ty 3 AP World](https://github.com/xMcacutt-Archipelago/Arc
 
 - [TygerFramework](https://github.com/ElusiveFluffy/TygerFramework/releases/latest)
 
-- [TygerMemory 2](https://github.com/xMcacutt/TygerMemory3) VERSION 1.0.0+
+- [TygerMemory 3](https://github.com/xMcacutt/TygerMemory3) VERSION 1.0.0+
 
 1. Follow the [Tyger Framework](https://github.com/ElusiveFluffy/TygerFramework/releases/latest) Setup guide
 2. Add the Ty3 AP Client dll to your plugins directory that should have been created when installing TygerFramework.
