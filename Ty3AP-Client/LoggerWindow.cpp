@@ -9,7 +9,6 @@ void LoggerWindow::Draw(int outerWidth, int outerHeight, float uiScale, ImFont* 
     if (!isVisible)
         return;
 
-
     UpdateVisibleMessages();
 
     // Render the Logger window at the bottom-left
@@ -122,11 +121,61 @@ std::string LoggerWindow::RemoveColorTags(const std::string& text) {
     return result;
 }
 
-
 void LoggerWindow::RenderFormattedText(ImDrawList* draw_list, const char* text, ImVec2 pos) {
     // Define keywords and associated colors
-    static const std::unordered_map<std::string, ImU32> keywordColors = {
-        //{"Golden Cog", IM_COL32(252, 210, 16, 255)},
+    const std::unordered_map<std::string, ImU32> keywordColors = {
+        {"Fire Stone", IM_COL32(0xD6, 0x06, 0x06, 0xFF)},
+        {"Water Stone", IM_COL32(0x1A, 0x2E, 0xDB, 0xFF)},
+        {"Air Stone", IM_COL32(0x47, 0xFF, 0x4A, 0xFF)},
+        {"Earth Stone", IM_COL32(0x63, 0x5D, 0x03, 0xFF)},
+        {"Chrono Stone", IM_COL32(0xAF, 0x03, 0xFF, 0xFF)},
+        {"Warp Stone", IM_COL32(0xAF, 0x7C, 0xEB, 0xFF)},
+        {"Ultra Stone", IM_COL32(0xA6, 0xE9, 0xF5, 0xFF)},
+        {"Mega Stone", IM_COL32(0xB1, 0xF5, 0xA6, 0xFF)},
+        {"Multi Stone", IM_COL32(0xFF, 0x8C, 0x00, 0xFF)},
+        {"Zoom Stone", IM_COL32(0x9B, 0x94, 0xD6, 0xFF)},
+        {"Magnet Stone", IM_COL32(0xFC, 0xC1, 0x92, 0xFF)},
+        {"Shadow Stone", IM_COL32(0x09, 0x00, 0x5E, 0xFF)},
+        {"Kromium Orb", IM_COL32(0xFF, 0x00, 0x00, 0xFF)},
+        {"Gooboo Berry", IM_COL32(0xF2, 0x03, 0xFF, 0xFF)},
+        {"Bilby", IM_COL32(0x73, 0x91, 0xFF, 0xFF)},
+        {"Opals", IM_COL32(0xFF, 0x3D, 0x3B, 0xFF)},
+        {"Duo Chassis", IM_COL32(0x85, 0x85, 0x85, 0xFF)},
+        {"Lash Chassis", IM_COL32(0xE8, 0xE4, 0x43, 0xFF)},
+        {"Smash Chassis", IM_COL32(0x66, 0x65, 0x26, 0xFF)},
+        {"Mega Chassis", IM_COL32(0x5A, 0x77, 0x78, 0xFF)},
+        {"Ring Chassis", IM_COL32(0xBA, 0xA8, 0xA8, 0xFF)},
+        {"Shadow Chassis", IM_COL32(0x35, 0x00, 0x78, 0xFF)},
+        {"Doom Chassis", IM_COL32(0xFF, 0xD5, 0x03, 0xFF)},
+        {"Shadow Beam", IM_COL32(0x24, 0xD9, 0x1E, 0xFF)},
+        {"Grav Grenade", IM_COL32(0x1E, 0x95, 0xD9, 0xFF)},
+        {"Satellite Strike", IM_COL32(0x24, 0xD9, 0x1E, 0xFF)},
+        {"Thermo Cannon", IM_COL32(0xD9, 0xCD, 0x1E, 0xFF)},
+        {"Nucleon Shield", IM_COL32(0xD9, 0xCD, 0x1E, 0xFF)},
+        {"Orbidrills", IM_COL32(0x1E, 0x95, 0xD9, 0xFF)},
+        {"Missing Persons Map", IM_COL32(0x73, 0x91, 0xFF, 0xFF)},
+        {"Shiny Thing Map", IM_COL32(0xFF, 0x00, 0x00, 0xFF)},
+        {"Sekrit Map", IM_COL32(0x77, 0xB5, 0x2B, 0xFF)},
+        {"Priceless Art Map", IM_COL32(0xF5, 0xC6, 0x1D, 0xFF)},
+        {"Forbidden Fruit Map", IM_COL32(0xF2, 0x03, 0xFF, 0xFF)},
+        {"Bunyip Gauntlet", IM_COL32(0x66, 0xEB, 0x5B, 0xFF)},
+        {"Duke", IM_COL32(0x8C, 0x5D, 0x38, 0xFF)},
+        {"Sly", IM_COL32(0xD6, 0x77, 0x2D, 0xFF)},
+        {"Karlos", IM_COL32(0xBA, 0xB3, 0xC7, 0xFF)},
+        {"Crabmersible", IM_COL32(0xFF, 0xA9, 0x00, 0xFF)},
+        {"Southern Rivers Gate", IM_COL32(0xCC, 0x00, 0x00, 0xFF)},
+        {"Cinder Canyon", IM_COL32(0xC2, 0xA8, 0x6B, 0xFF)},
+        {"Dead Dingo Marsh", IM_COL32(0x4D, 0xA3, 0x60, 0xFF)},
+        {"Gooboo Gully", IM_COL32(0x48, 0xAB, 0x00, 0xFF)},
+        {"Kaka Boom Island", IM_COL32(0x26, 0xA9, 0xD1, 0xFF)},
+        {"Mount Boom Basin", IM_COL32(0x26, 0xD1, 0x48, 0xFF)},
+        {"Quinking", IM_COL32(0xA6, 0x00, 0xCF, 0xFF)},
+        {"Rang", IM_COL32(0xCF, 0x87, 0x00, 0xFF)},
+        {"Stone", IM_COL32(0xC2, 0x85, 0x65, 0xFF)},
+        {"Steve", IM_COL32(0x77, 0xB5, 0x2B, 0xFF)},
+        {"Picture Frame", IM_COL32(0xF5, 0xC6, 0x1D, 0xFF)},
+        {"Mission", IM_COL32(0x1D, 0xF5, 0x21, 0xFF)},
+        {"Shop", IM_COL32(0xF5, 0xE0, 0x1D, 0xFF)},
     };
 
     ImU32 current_color = IM_COL32(255, 255, 255, 255); // Default white
@@ -159,7 +208,7 @@ void LoggerWindow::RenderFormattedText(ImDrawList* draw_list, const char* text, 
         // Check for keywords and apply coloring
         for (const auto& [keyword, color] : keywordColors) {
             size_t len = keyword.length();
-            if (strncmp(s, keyword.c_str(), len) == 0 && (s[len] == ' ' || s[len] == '\0')) {
+            if (compareStrings(s, keyword.c_str(), len) && (s[len] == ' ' || s[len] == '\0')) {
                 // Draw previous segment before keyword
                 if (segment_start < s) {
                     draw_list->AddText(ImVec2(x_pos, pos.y), current_color, segment_start, s);
@@ -215,33 +264,3 @@ void LoggerWindow::Log(const std::string& message)
     }
 }
 
-void LoggerWindow::LogNodes(APClient::PrintJSONArgs printdata)
-{
-    for (auto& window : GUI::windows) {
-        if (auto logger = dynamic_cast<LoggerWindow*>(window.get())) {
-            std::string message;
-            for (const auto& text : printdata.data) {
-                if (text.type == "") {
-                    auto it = logger->apKeywordColors.find(text.color);
-                    std::string colorHex = (it != logger->apKeywordColors.end()) ? it->second : "FFFFFF";
-                    message += text.text;
-                }
-                if (text.type == "player_id") {
-                    int value = std::atoi(text.text.c_str());
-                    message += ArchipelagoHandler::GetPlayerName(value);
-                }
-                if (text.type == "item_id") {
-                    message += ArchipelagoHandler::GetItemName(printdata.item->item, printdata.item->player);
-                }
-                if (text.type == "location_id") {
-                    int value = std::atoi(text.text.c_str());
-                    message += ArchipelagoHandler::GetLocationName(value, printdata.item->player);
-                }
-            }
-            logger->AddLogMessage(message);
-
-            break;
-        }
-    }
-    
-}

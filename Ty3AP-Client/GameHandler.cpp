@@ -66,8 +66,16 @@ void GameHandler::OnChunkLoaded() {
 int __stdcall GameHandler::CanActivateMission(uintptr_t* missionPtr)
 {
 	auto const* mission = (MissionStruct*)(reinterpret_cast<std::byte*>(missionPtr));
-	if (int id = mission->missionId & 0xffff; gameActiveMissions.end() != std::find(gameActiveMissions.begin(), gameActiveMissions.end(), id)) {
-		API::LogPluginMessage("CanActivateMission: " + std::to_string(id) + " allowed");
+	auto missionId = mission->missionId & 0xffff;
+	if ((missionId > Mission::QUINKING && missionId < Mission::GO_FIND_BOSS_CASS))
+		return 1;
+	if (gameActiveMissions.end() != std::find(gameActiveMissions.begin(), gameActiveMissions.end(), missionId)) {
+//API::LogPluginMessage("CanActivateMission: " + std::to_string(missionId) + " allowed");
+		return 1;
+	}
+	auto& savedAllowed = ArchipelagoHandler::customSaveData->allowedActiveMissions;
+	if (savedAllowed.end() != std::find(savedAllowed.begin(), savedAllowed.end(), missionId)) {
+//API::LogPluginMessage("CanActivateMission: " + std::to_string(missionId) + " allowed");
 		return 1;
 	}
 	return 0;
@@ -77,10 +85,16 @@ void GameHandler::OnGameLoaded()
 {
 	API::LogPluginMessage("GameLoaded");
 	SaveDataHandler::RunLoadSetup(ArchipelagoHandler::slotdata);
-	for (auto mission : GameHandler::autoActiveMissions) {
+	for (auto mission : GameHandler::autoAvailableMissions) {
 		auto missionState = SaveData::FindMissionById(mission)->missionState;
 		if (missionState == MissionState::UNAVAILABLE) {
 			SaveData::FindMissionById(mission)->missionState = MissionState::AVAILABLE;
+		}
+	}
+	for (auto mission : GameHandler::autoActiveMissions) {
+		auto missionState = SaveData::FindMissionById(mission)->missionState;
+		if (missionState == MissionState::UNAVAILABLE) {
+			SaveData::FindMissionById(mission)->missionState = MissionState::ACTIVE;
 		}
 	}
 }

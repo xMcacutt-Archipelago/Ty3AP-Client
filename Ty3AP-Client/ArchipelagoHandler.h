@@ -34,7 +34,6 @@ public:
 	static bool IsLocationChecked(int64_t locationId);
 	static int CountLocationsChecked(const std::list<int64_t>& locationId);
 	static void SetAPStatus(std::string status, char important);
-	static bool LoadSaveData();
 	static std::string uuid;
 	static bool ap_connected;
 	static bool polling;

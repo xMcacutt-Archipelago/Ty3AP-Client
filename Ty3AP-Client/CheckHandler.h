@@ -10,6 +10,8 @@ public:
 	static void OnCollectCollectible(int id, int type);
     static void OnCompleteMission(void* mission, int status);
     static void OnBuyItem(void* item);
+    static void OnGetShadowPiece(uintptr_t* shadowPiecePtr);
+    static void OnFindItem(void* item);
 
     static inline const std::string collectibles[7] = {
         "Berry",

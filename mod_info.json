@@ -2,7 +2,7 @@
   "name": "Ty3 AP Client",
   "description": "This is a mod to connect to the multi world randomizer archipelago.",
   "dll_name": "Ty3AP-Client",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "dependencies": [
     {
       "dep_name": "TygerMemory3",

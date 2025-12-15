@@ -20,4 +20,5 @@ void APSaveData::CheckGoal()
 
 	LoggerWindow::Log("The Quinking awaits...");
 	SaveData::FindMissionById(Mission::QUINKING)->missionState = MissionState::AVAILABLE;
+	SaveData::FindMissionById(Mission::QUINKING - 1)->missionState = MissionState::AVAILABLE;
 }

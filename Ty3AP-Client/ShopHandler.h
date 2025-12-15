@@ -13,7 +13,6 @@ public:
     typedef int(__cdecl* GetStringFunc)(int param_1);
     static inline GetStringFunc getStringFunc = nullptr;
     static int __cdecl OnGetString(int param_1);
-private:
     static inline std::list<int> validShopItems = {
         Item::FIRE_STONE,
         Item::WATER_STONE,
@@ -63,7 +62,7 @@ private:
         Item::SKY_FORCE,
         Item::SPITFIRE,
     };
-
+private:
     static inline std::unordered_map<std::string, const char*> itemNameToImg = {
         {"Power Star", "AP_PowerStar"},
         {"Pagie", "AP_Pagie"},
@@ -108,8 +107,6 @@ private:
         {"Warp Stone", "fe_700_warp"},
         {"Water Stone", "fe_700_water"},
         {"Zoom Stone", "fe_700_zoom"},
-
-        {"Grav Grenade", "fe_700_air"},
 
         {"Duo Chassis", "fe_700_rang_duo"},
         {"Lash Chassis", "fe_700_rang_lash"},
@@ -164,8 +161,8 @@ private:
 
     static int GetCost(int flags) 
     {
-        if (flags & 1) return 3000;
-        if (flags & 2) return 1500;
+        if (flags & 1) return 1500;
+        if (flags & 2) return 1000;
         return 500;
     }
 };

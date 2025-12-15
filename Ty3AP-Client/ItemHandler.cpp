@@ -20,61 +20,89 @@ void ItemHandler::HandleItem(APClient::NetworkItem item)
 
     switch (item.item) {
     case Ty3Item::Sly:
-        SaveData::FindMissionById(Mission::SLY_MISSION)->missionState = MissionState::AVAILABLE;
+        SaveData::FindMissionById(Mission::SLY_MISSION)->missionState = MissionState::COMPLETE;
         SaveData::FindMissionById(Mission::QUINKAN_ARMADA)->missionState = MissionState::AVAILABLE;
+        ArchipelagoHandler::customSaveData->allowedActiveMissions.insert(Mission::QUINKAN_ARMADA);
         SaveData::FindMissionById(Mission::EGG_HUNT)->missionState = MissionState::AVAILABLE;
+        ArchipelagoHandler::customSaveData->allowedActiveMissions.insert(Mission::EGG_HUNT);
         SaveData::FindMissionById(Mission::POWER_STRUGGLE)->missionState = MissionState::AVAILABLE;
+        ArchipelagoHandler::customSaveData->allowedActiveMissions.insert(Mission::POWER_STRUGGLE);
         SaveData::FindMissionById(Mission::MELTDOWN)->missionState = MissionState::AVAILABLE;
+        ArchipelagoHandler::customSaveData->allowedActiveMissions.insert(Mission::MELTDOWN);
         SaveData::FindMissionById(Mission::RANGER_ENDANGER)->missionState = MissionState::AVAILABLE;
+        ArchipelagoHandler::customSaveData->allowedActiveMissions.insert(Mission::RANGER_ENDANGER);
         SaveData::FindMissionById(Mission::REDBACK_RUNDOWN)->missionState = MissionState::AVAILABLE;
+        ArchipelagoHandler::customSaveData->allowedActiveMissions.insert(Mission::REDBACK_RUNDOWN);
         break;
     case Ty3Item::Duke:
-        SaveData::FindMissionById(Mission::DUKE_MISSION)->missionState = MissionState::AVAILABLE;
+        SaveData::FindMissionById(Mission::DUKE_MISSION)->missionState = MissionState::COMPLETE;
 		SaveData::FindMissionById(Mission::WRATH_OF_THE_DRAGONQUIN)->missionState = MissionState::AVAILABLE;
+        ArchipelagoHandler::customSaveData->allowedActiveMissions.insert(Mission::WRATH_OF_THE_DRAGONQUIN);
         SaveData::FindMissionById(Mission::ALL_YOUR_BASE)->missionState = MissionState::AVAILABLE;
+        ArchipelagoHandler::customSaveData->allowedActiveMissions.insert(Mission::ALL_YOUR_BASE);
         SaveData::FindMissionById(Mission::AERO_COAST_GUARD)->missionState = MissionState::AVAILABLE;
+        ArchipelagoHandler::customSaveData->allowedActiveMissions.insert(Mission::AERO_COAST_GUARD);
         SaveData::FindMissionById(Mission::FOREST_FIREPOWER)->missionState = MissionState::AVAILABLE;
+        ArchipelagoHandler::customSaveData->allowedActiveMissions.insert(Mission::FOREST_FIREPOWER);
         ArchipelagoHandler::customSaveData->hasUnlockedDuke = true;
-		if (ArchipelagoHandler::customSaveData->hasUnlockedBasin)
-			SaveData::FindMissionById(Mission::FIND_THE_SHADOWRING)->missionState = MissionState::AVAILABLE;
-        if (ArchipelagoHandler::customSaveData->hasUnlockedKakaboom)
+        if (ArchipelagoHandler::customSaveData->hasUnlockedBasin) {
+			SaveData::FindMissionById(Mission::FIND_THE_SHADOWRING)->missionState = MissionState::ACTIVE;
+            ArchipelagoHandler::customSaveData->allowedActiveMissions.insert(Mission::FIND_THE_SHADOWRING);
+        }
+        if (ArchipelagoHandler::customSaveData->hasUnlockedKakaboom) {
             SaveData::FindMissionById(Mission::SEA_CHANGE)->missionState = MissionState::AVAILABLE;
-        if (ArchipelagoHandler::customSaveData->hasUnlockedCinder)
+            ArchipelagoHandler::customSaveData->allowedActiveMissions.insert(Mission::SEA_CHANGE);
+        }
+        if (ArchipelagoHandler::customSaveData->hasUnlockedCinder) {
 			SaveData::FindMissionById(Mission::BROWN_KIWI_DOWN)->missionState = MissionState::AVAILABLE;
+            ArchipelagoHandler::customSaveData->allowedActiveMissions.insert(Mission::BROWN_KIWI_DOWN);
+        }
         break;
     case Ty3Item::Karlos:
-        SaveData::FindMissionById(Mission::KARLOS_MISSION)->missionState = MissionState::AVAILABLE;
+        SaveData::FindMissionById(Mission::KARLOS_MISSION)->missionState = MissionState::COMPLETE;
         SaveData::FindMissionById(Mission::BATTLE_ARENA_GAMMA)->missionState = MissionState::AVAILABLE;
+        ArchipelagoHandler::customSaveData->allowedActiveMissions.insert(Mission::BATTLE_ARENA_GAMMA);
         SaveData::FindMissionById(Mission::BATTLE_ARENA_ZETA)->missionState = MissionState::AVAILABLE;
+        ArchipelagoHandler::customSaveData->allowedActiveMissions.insert(Mission::BATTLE_ARENA_ZETA);
         SaveData::FindMissionById(Mission::RESCUE_JULIUS)->missionState = MissionState::AVAILABLE;
+        ArchipelagoHandler::customSaveData->allowedActiveMissions.insert(Mission::RESCUE_JULIUS);
         GameHandler::OnChunkLoaded();
         break;
     case Ty3Item::Crabmersible:
-        SaveData::FindMissionById(Mission::CRAB_MISSION)->missionState = MissionState::AVAILABLE;
+        SaveData::FindMissionById(Mission::CRAB_MISSION)->missionState = MissionState::COMPLETE;
+        SaveData::FindMissionById(Mission::CRAB_INTRO)->missionState = MissionState::COMPLETE;
         break;
     case Ty3Item::SouthernRiversGate:
-        SaveData::FindMissionById(Mission::SWAMP_MISSION)->missionState = MissionState::AVAILABLE;
+        SaveData::FindMissionById(Mission::SWAMP_MISSION)->missionState = MissionState::COMPLETE;
         break;
     case Ty3Item::CinderCanyon:
         ArchipelagoHandler::customSaveData->hasUnlockedCinder = true;
-        if (ArchipelagoHandler::customSaveData->hasUnlockedDuke)
+        if (ArchipelagoHandler::customSaveData->hasUnlockedDuke) {
             SaveData::FindMissionById(Mission::BROWN_KIWI_DOWN)->missionState = MissionState::AVAILABLE;
+            ArchipelagoHandler::customSaveData->allowedActiveMissions.insert(Mission::BROWN_KIWI_DOWN);
+        }
         break;
     case Ty3Item::DeadDingoMarsh:
-        SaveData::FindMissionById(Mission::MEET_SHAZZA)->missionState = MissionState::AVAILABLE;
+        SaveData::FindMissionById(Mission::MEET_SHAZZA)->missionState = MissionState::ACTIVE;
+        ArchipelagoHandler::customSaveData->allowedActiveMissions.insert(Mission::MEET_SHAZZA);
         break;
     case Ty3Item::GoobooGully:
-        SaveData::FindMissionById(Mission::THE_SEARCH_FOR_STEVE)->missionState = MissionState::AVAILABLE;
+        SaveData::FindMissionById(Mission::THE_SEARCH_FOR_STEVE)->missionState = MissionState::ACTIVE;
+        ArchipelagoHandler::customSaveData->allowedActiveMissions.insert(Mission::THE_SEARCH_FOR_STEVE);
         break;
     case Ty3Item::KakaBoomIsland:
         ArchipelagoHandler::customSaveData->hasUnlockedKakaboom = true;
-        if (ArchipelagoHandler::customSaveData->hasUnlockedDuke) 
+        if (ArchipelagoHandler::customSaveData->hasUnlockedDuke) {
             SaveData::FindMissionById(Mission::SEA_CHANGE)->missionState = MissionState::AVAILABLE;
+            ArchipelagoHandler::customSaveData->allowedActiveMissions.insert(Mission::SEA_CHANGE);
+        }
         break;
     case Ty3Item::MountBoomBasin:
         ArchipelagoHandler::customSaveData->hasUnlockedBasin = true;
-        if (ArchipelagoHandler::customSaveData->hasUnlockedDuke)
-            SaveData::FindMissionById(Mission::FIND_THE_SHADOWRING)->missionState = MissionState::AVAILABLE;
+        if (ArchipelagoHandler::customSaveData->hasUnlockedDuke) {
+            SaveData::FindMissionById(Mission::FIND_THE_SHADOWRING)->missionState = MissionState::ACTIVE;
+            ArchipelagoHandler::customSaveData->allowedActiveMissions.insert(Mission::FIND_THE_SHADOWRING);
+        }
         break;
     case Ty3Item::ShadowBeam:
 		SaveData::FindItemById(Item::SHADOW_BEAM)->numOwned++;
@@ -187,12 +215,15 @@ void ItemHandler::HandleItem(APClient::NetworkItem item)
         break;
 
     case Ty3Item::KromiumOrb:
+        ArchipelagoHandler::customSaveData->orbCount++;
         SaveData::GetData()->orbsCollected++;
         break;
     case Ty3Item::GoobooBerry:
+        ArchipelagoHandler::customSaveData->berryCount++;
         SaveData::GetData()->berriesCollected++;
         break;
     case Ty3Item::Bilby:
+        ArchipelagoHandler::customSaveData->bilbyCount++;
         SaveData::GetData()->bilbiesCollected++;
         break;
 

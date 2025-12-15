@@ -21,14 +21,16 @@ public:
 	static inline std::list<int> gameActiveMissions = { 
 		Mission::SAVE_THE_DREAMING, 
 		Mission::RESCUE_THE_GENERAL,
-		Mission::THE_BIG_RACE
+		Mission::THE_BIG_RACE,
 	};
-	static inline std::list<int> autoActiveMissions = {
+	static inline std::list<int> autoAvailableMissions = {
 		Mission::EXPERI_MENTAL_CART,
 		Mission::DENNIS_DILEMMA,
 		Mission::DEMOLITION_DERBY,
 		Mission::RESPECT_EFFECT,
 		Mission::REDBACK_STASH,
+	};
+	static inline std::list<int> autoActiveMissions = {
 		Mission::HEINOUS_HEXAQUIN,
 		Mission::GO_FIND_BOSS_CASS
 	};

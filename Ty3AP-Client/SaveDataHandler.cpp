@@ -123,6 +123,7 @@ void SaveDataHandler::write_json_file(const std::string& filename) {
 	j["HasShadowChassis"] = ArchipelagoHandler::customSaveData->hasShadowChassis;
 	j["ShadowStones"] = ArchipelagoHandler::customSaveData->shadowStoneCount;
 	j["HasGauntlet"] = ArchipelagoHandler::customSaveData->hasGauntlet;
+	j["AllowedActiveMissions"] = ArchipelagoHandler::customSaveData->allowedActiveMissions;
 
 	// Write to file
 	std::ofstream file(filename);
@@ -157,6 +158,7 @@ void SaveDataHandler::read_json_file(const std::string& filename) {
 	ArchipelagoHandler::customSaveData->hasShadowChassis = j["HasShadowChassis"] == 1;
 	ArchipelagoHandler::customSaveData->shadowStoneCount = j["ShadowStones"];
 	ArchipelagoHandler::customSaveData->hasGauntlet = j["HasGauntlet"] == 1;
+	ArchipelagoHandler::customSaveData->allowedActiveMissions = j["AllowedActiveMissions"].get<std::set<int>>();
 }
 
 bool SaveDataHandler::hasRunSetup = false;

@@ -30,6 +30,9 @@ static std::mutex strIDtoDescTextMutex;
 static std::map<int, std::string> strIDtoImgText = {};
 static std::mutex strIDtoImgTextMutex;
 
+static std::map<int, int> IDtoCost = {};
+static std::mutex IDtoCostMutex;
+
 std::list<int64_t> scouteditems;
 const char* ShopHandler::GetShopItemName(int strId, bool hint) {
 	auto itemIdOpt = GetItemIdFromStringId(strId);
@@ -68,14 +71,19 @@ const char* ShopHandler::GetShopItemName(int strId, bool hint) {
 
 void ShopHandler::SetShopItems() {
 	auto rangShop = SaveData::FindShopById(Shop::RANG_SHOP);
-	int indexCurrency0 = 0, indexCurrency1 = 0;
+	int indexCurrency1 = 0;
 	for (auto itemIndex = 0; itemIndex < rangShop->itemCount; itemIndex++) {
 		auto item = rangShop->items[itemIndex];
 		switch (item->currencyType) {
 		case 0:
-			item->baseCost = 2500;
-			indexCurrency0++;
+		{
+			std::lock_guard<std::mutex> lock(IDtoCostMutex);
+			auto it = IDtoCost.find(item->itemId);
+			if (it != IDtoCost.end()) {
+				item->baseCost = it->second;
+			}
 			break;
+		}
 		case 1:
 			item->baseCost = (indexCurrency1 + 1) * 3;
 			indexCurrency1++;
@@ -85,26 +93,36 @@ void ShopHandler::SetShopItems() {
 	}
 
 	auto cassopolisShop = SaveData::FindShopById(Shop::CASSOPOLIS);
-	indexCurrency0 = 0;
 	for (auto itemIndex = 0; itemIndex < cassopolisShop->itemCount; itemIndex++) {
 		auto item = cassopolisShop->items[itemIndex];
-		if (item->currencyType == 0) {
-			item->baseCost = 2500;
-			indexCurrency0++;
-		}
 		ShopHandler::GetShopItemName(item->titleId, false);
+		if (item->currencyType == 0)
+		{
+			{
+				std::lock_guard<std::mutex> lock(IDtoCostMutex);
+				auto it = IDtoCost.find(item->itemId);
+				if (it != IDtoCost.end()) {
+					item->baseCost = it->second;
+				}
+				break;
+			}
+		}
 	}
 
 	auto mobileHQ = SaveData::FindShopById(Shop::MOBILE_HQ);
 	int indexCurrency2 = 0, indexCurrency3 = 0;
-	indexCurrency0 = 0;
 	for (auto itemIndex = 0; itemIndex < mobileHQ->itemCount; itemIndex++) {
 		auto item = mobileHQ->items[itemIndex];
 		switch (item->currencyType) {
 		case 0:
-			item->baseCost = 2500;
-			indexCurrency0++;
+		{
+			std::lock_guard<std::mutex> lock(IDtoCostMutex);
+			auto it = IDtoCost.find(item->itemId);
+			if (it != IDtoCost.end()) {
+				item->baseCost = it->second;
+			}
 			break;
+		}
 		case 2:
 			item->baseCost = (indexCurrency2 + 1) * 2;
 			indexCurrency2++;
@@ -118,14 +136,20 @@ void ShopHandler::SetShopItems() {
 	}
 
 	auto secretShop = SaveData::FindShopById(Shop::SECRET_SHOP);
-	indexCurrency0 = 0;
 	for (auto itemIndex = 0; itemIndex < secretShop->itemCount; itemIndex++) {
 		auto item = secretShop->items[itemIndex];
-		if (item->currencyType == 0) {
-			item->baseCost = 5000;
-			indexCurrency0++;
-		}
 		ShopHandler::GetShopItemName(item->titleId, false);
+		if (item->currencyType == 0)
+		{
+			{
+				std::lock_guard<std::mutex> lock(IDtoCostMutex);
+				auto it = IDtoCost.find(item->itemId);
+				if (it != IDtoCost.end()) {
+					item->baseCost = it->second;
+				}
+				break;
+			}
+		}
 	}
 }
 
@@ -148,6 +172,11 @@ void ShopHandler::FillShopItemNames(const std::list<APClient::NetworkItem>& item
 		{
 			std::lock_guard<std::mutex> lock(strIDtoDescTextMutex);
 			strIDtoDescText[shopItem->descId] = ArchipelagoHandler::GetItemDesc(netItem.player);
+		}
+
+		{
+			std::lock_guard<std::mutex> lock(IDtoCostMutex);
+			IDtoCost[shopItem->itemId] = ShopHandler::GetCost(netItem.flags);
 		}
 
 		auto itemName = ArchipelagoHandler::GetItemName(netItem.item, netItem.player);

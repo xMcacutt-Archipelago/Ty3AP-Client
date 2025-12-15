@@ -29,6 +29,8 @@ public:
 		
 	};
 
+	std::set<int> allowedActiveMissions = {};
+
 	static inline std::list<int64_t> storyMissionLocations = {
 		0x6d00 + Mission::SAVE_THE_DREAMING,
 		0x6d00 + Mission::RESCUE_THE_GENERAL,

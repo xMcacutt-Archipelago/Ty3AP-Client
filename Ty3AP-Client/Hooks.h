@@ -16,7 +16,8 @@ private:
 	static void __stdcall RecalcSaveDataSize2Hook();
 	static void __stdcall SaveFileHook();
 	static void __stdcall ChunkLoadedHook();
-	static void __stdcall DeathHook();
+	static void __stdcall FindItemHook();
+	static void __stdcall GetShadowPieceHook();
 public:
 	static void SetupHooks();
 };

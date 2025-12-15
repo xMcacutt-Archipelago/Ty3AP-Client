@@ -114,6 +114,22 @@ __declspec(naked) void __stdcall Hooks::PurchaseItemHook() {
 	}
 }
 
+FunctionType GetShadowPieceOrigin = nullptr;
+uintptr_t GetShadowPieceOriginReturnAddr;
+__declspec(naked) void __stdcall Hooks::GetShadowPieceHook() {
+	_asm {
+		pushad
+		pushfd
+		push esi
+		call CheckHandler::OnGetShadowPiece
+		pop esi
+		popfd
+		popad
+		mov [esi+0x108],7
+		jmp dword ptr[GetShadowPieceOriginReturnAddr]
+	}
+}
+
 FunctionType LoadSaveFileOrigin = nullptr;
 uintptr_t LoadSaveFileOriginReturnAddr;
 __declspec(naked) void __stdcall Hooks::LoadSaveFileHook() {
@@ -178,6 +194,22 @@ __declspec(naked) void __stdcall Hooks::ChunkLoadedHook() {
 	}
 }
 
+FunctionType FindItemOrigin = nullptr;
+uintptr_t FindItemOriginReturnAddr;
+__declspec(naked) void __stdcall Hooks::FindItemHook() {
+	_asm {
+		call dword ptr[eax+0x64]
+		pushfd
+		pushad
+		push eax
+		call CheckHandler::OnFindItem
+		pop eax
+		popad
+		popfd
+		jmp dword ptr[FindItemOriginReturnAddr]
+	}
+}
+
 void Hooks::SetupHooks() {
 	char* addr;
 
@@ -192,6 +224,10 @@ void Hooks::SetupHooks() {
 	CollectCollectibleOriginReturnAddr = Core::moduleBase + 0x11179a + 5;
 	addr = (char*)(Core::moduleBase + 0x11179a);
 	MH_CreateHook((LPVOID)addr, &CollectCollectibleHook, reinterpret_cast<LPVOID*>(&CollectCollectibleOrigin));
+
+	FindItemOriginReturnAddr = Core::moduleBase + 0x18bc56;
+	addr = (char*)(Core::moduleBase + 0x18bc50);
+	MH_CreateHook((LPVOID)addr, &FindItemHook, reinterpret_cast<LPVOID*>(&FindItemOrigin));
 
 	CompleteMissionOriginReturnAddr = Core::moduleBase + 0x1143b0 + 5;
 	CompleteMissionSkipOriginReturnAddr = Core::moduleBase + 0x114657;
@@ -227,6 +263,10 @@ void Hooks::SetupHooks() {
 
 	addr = (char*)(Core::moduleBase + 0x313940);
 	MH_CreateHook((LPVOID)addr, &ShopHandler::OnGetString, reinterpret_cast<void**>(&ShopHandler::getStringFunc));
+
+	GetShadowPieceOriginReturnAddr = Core::moduleBase + 0x18a827;
+	addr = (char*)(Core::moduleBase + 0x18a81d);
+	MH_CreateHook((LPVOID)addr, &Hooks::GetShadowPieceHook, reinterpret_cast<void**>(&GetShadowPieceOrigin));
 
 	GameHandler::SetToNoOperation((uintptr_t*)(Core::moduleBase + 0x3470A5), 26);
 	GameHandler::SetToJmp((uintptr_t*)(Core::moduleBase + 0x3470E8));
