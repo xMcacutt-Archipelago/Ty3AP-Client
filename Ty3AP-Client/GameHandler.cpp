@@ -70,12 +70,16 @@ int __stdcall GameHandler::CanActivateMission(uintptr_t* missionPtr)
 	if ((missionId > Mission::QUINKING && missionId < Mission::GO_FIND_BOSS_CASS))
 		return 1;
 	if (gameActiveMissions.end() != std::find(gameActiveMissions.begin(), gameActiveMissions.end(), missionId)) {
-//API::LogPluginMessage("CanActivateMission: " + std::to_string(missionId) + " allowed");
+		return 1;
+	}
+	if (autoActiveMissions.end() != std::find(autoActiveMissions.begin(), autoActiveMissions.end(), missionId)) {
+		return 1;
+	}
+	if (autoAvailableMissions.end() != std::find(autoAvailableMissions.begin(), autoAvailableMissions.end(), missionId)) {
 		return 1;
 	}
 	auto& savedAllowed = ArchipelagoHandler::customSaveData->allowedActiveMissions;
 	if (savedAllowed.end() != std::find(savedAllowed.begin(), savedAllowed.end(), missionId)) {
-//API::LogPluginMessage("CanActivateMission: " + std::to_string(missionId) + " allowed");
 		return 1;
 	}
 	return 0;

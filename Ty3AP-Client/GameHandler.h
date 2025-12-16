@@ -32,7 +32,7 @@ public:
 	};
 	static inline std::list<int> autoActiveMissions = {
 		Mission::HEINOUS_HEXAQUIN,
-		Mission::GO_FIND_BOSS_CASS
+		Mission::GO_FIND_BOSS_CASS,
 	};
 	typedef void(__thiscall* StateTransitionFunc)(uintptr_t* thisPtr, int firstArg, int secondArg);
 	static inline StateTransitionFunc stateTransitionFunc = nullptr;
