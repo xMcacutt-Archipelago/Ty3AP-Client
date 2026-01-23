@@ -2,14 +2,16 @@
 #include "Window.h"
 #include "gui.h"
 #include <cctype> 
+#include "ArchipelagoHandler.h"
 #include <algorithm> 
+#include <regex>
 
 class LoggerWindow : public Window
 {
 public:
 	LoggerWindow() : Window("Logger") {};
 	void ToggleVisibility() override;
-	void Draw(int outerWidth, int outerHeight, float uiScale, ImFont* font) override;
+	void Draw(int outerWidth, int outerHeight, float uiScale) override;
 	std::string RemoveColorTags(const std::string& text);
 	void AddLogMessage(const std::string& message);
 	static void Log(const std::string& message);

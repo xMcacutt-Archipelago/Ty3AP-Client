@@ -2,7 +2,7 @@
   "name": "Ty3 AP Client",
   "description": "This is a mod to connect to the multi world randomizer archipelago.",
   "dll_name": "Ty3AP-Client",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "dependencies": [
     {
       "dep_name": "TygerMemory3",
@@ -14,7 +14,7 @@
   "author": "xMcacutt",
   "download_url": "https://github.com/xMcacutt-Archipelago/Ty3AP-Client/releases/latest/download/Ty3AP-Client.zip",
   "icon_url": "https://raw.githubusercontent.com/xMcacutt-Archipelago/Ty1AP-Client/refs/heads/master/favico.ico",
-  "last_updated": "2025-12-15",
+  "last_updated": "2026-01-23",
   "website": "https://github.com/xMcacutt-Archipelago/Ty3AP-Client?tab=readme-ov-file#ty-the-tasmanian-tiger-3---archipelago-client-plugin",
   "games": [ "Ty 3" ]
 }

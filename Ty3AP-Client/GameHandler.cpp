@@ -41,6 +41,109 @@ void GameHandler::KillTy()
 	}
 }
 
+void RestoreBunyipMissionStatuses() {
+	for (const auto& [missionId, status] : ArchipelagoHandler::customSaveData->savedBunyipStatuses)
+	{
+		auto mission = SaveData::FindMissionById(missionId);
+		if (mission->missionState != MissionState::COMPLETE && mission->missionState != MissionState::REPLAYABLE)
+			mission->missionState = status;
+	}
+}
+
+void GameHandler::OnWriteLevel(uintptr_t strPtr) {
+	auto levelName = reinterpret_cast<const char*>(strPtr);
+	std::string chunkNameStr(levelName);
+	if (levelName == "O1" || levelName == "O2")
+		RestoreBunyipMissionStatuses();
+}
+
+Bunyip selectedBunyip = Bunyip::SHADOW;
+void GameHandler::OnChunkQueued(uintptr_t chunkPtr) {
+	auto chunkName = reinterpret_cast<const char*>(chunkPtr);
+	std::string chunkNameStr(chunkName);
+	API::LogPluginMessage("OnChunkQueued: " + chunkNameStr);
+	if (chunkNameStr == "RM7_Chunk_01")
+	{
+		API::LogPluginMessage("M7 QUEUED");
+		auto shadow1 = SaveData::FindMissionById(Mission::QUINKAN_ARMADA);
+		auto extreme1 = SaveData::FindMissionById(Mission::EGG_HUNT);
+		ArchipelagoHandler::customSaveData->savedBunyipStatuses[Mission::EGG_HUNT] = extreme1->missionState;
+		ArchipelagoHandler::customSaveData->savedBunyipStatuses[Mission::QUINKAN_ARMADA] = shadow1->missionState;
+		if (selectedBunyip == Bunyip::SHADOW) {
+			API::LogPluginMessage("SHADOW BUNYIP");
+			extreme1->missionState = MissionState::UNAVAILABLE;
+			shadow1->missionState = MissionState::ACTIVE;
+		}
+		if (selectedBunyip == Bunyip::EXTREME) {
+			API::LogPluginMessage("EXTREME BUNYIP");
+			shadow1->missionState = MissionState::UNAVAILABLE;
+			extreme1->missionState = MissionState::ACTIVE;
+		}
+	}
+	else if (chunkNameStr == "RM17_chunk_01")
+	{
+		API::LogPluginMessage("M17 QUEUED");
+		auto shadow2 = SaveData::FindMissionById(Mission::POWER_STRUGGLE);
+		auto extreme2 = SaveData::FindMissionById(Mission::REDBACK_RUNDOWN);
+		ArchipelagoHandler::customSaveData->savedBunyipStatuses[Mission::REDBACK_RUNDOWN] = extreme2->missionState;
+		ArchipelagoHandler::customSaveData->savedBunyipStatuses[Mission::POWER_STRUGGLE] = shadow2->missionState;
+		if (selectedBunyip == Bunyip::SHADOW) {
+			API::LogPluginMessage("SHADOW BUNYIP");
+			extreme2->missionState = MissionState::UNAVAILABLE;
+			shadow2->missionState = MissionState::ACTIVE;
+		}
+		if (selectedBunyip == Bunyip::EXTREME) {
+			API::LogPluginMessage("EXTREME BUNYIP");
+			shadow2->missionState = MissionState::UNAVAILABLE;
+			extreme2->missionState = MissionState::ACTIVE;
+		}
+	}
+	else if (chunkNameStr == "RM29_chunk_01")
+	{
+		auto shadow3 = SaveData::FindMissionById(Mission::RANGER_ENDANGER);
+		auto extreme3 = SaveData::FindMissionById(Mission::MELTDOWN);
+		ArchipelagoHandler::customSaveData->savedBunyipStatuses[Mission::MELTDOWN] = extreme3->missionState;
+		ArchipelagoHandler::customSaveData->savedBunyipStatuses[Mission::RANGER_ENDANGER] = shadow3->missionState;
+		if (selectedBunyip == Bunyip::SHADOW) {
+			extreme3->missionState = MissionState::UNAVAILABLE;
+			shadow3->missionState = MissionState::ACTIVE;
+		}
+		if (selectedBunyip == Bunyip::EXTREME) {
+			shadow3->missionState = MissionState::UNAVAILABLE;
+			extreme3->missionState = MissionState::ACTIVE;
+		}
+	}
+	else {
+		return;
+	}
+
+	std::string filePath = "./Saves/" + ArchipelagoHandler::GetSaveIdentifier();
+	SaveDataHandler::write_json_file(filePath + ".json");
+
+	*(int*)(Core::moduleBase + 0x490400) = 0;
+	void (*save)() = reinterpret_cast<void(*)()>(Core::moduleBase + 0x2527A0);
+	save();
+}
+
+void GameHandler::OnChunkQueuedWithoutQueuer(uintptr_t chunkPtr) {
+	auto strPtr = *(uintptr_t*)(chunkPtr);
+	auto chunkName = reinterpret_cast<const char*>(strPtr);
+	std::string chunkNameStr(chunkName);
+	API::LogPluginMessage("OnChunkQueuedWithoutQueuer: " + chunkNameStr);
+	if (chunkNameStr == "RT1_Chunk_01" || chunkNameStr == "RT2_Chunk_01")
+		RestoreBunyipMissionStatuses();
+	else
+		return;
+
+	//std::string filePath = "./Saves/" + ArchipelagoHandler::GetSaveIdentifier();
+	//SaveDataHandler::write_json_file(filePath + ".json");
+
+	//*(int*)(Core::moduleBase + 0x490400) = 0;
+	//void (*save)() = reinterpret_cast<void(*)()>(Core::moduleBase + 0x2527A0);
+	//save();
+}
+
+
 void GameHandler::OnChunkLoaded() {
 	if (auto rescueJuliusDoor = MKObject::GetMKObject(90284)) {
 		auto shouldOpen = SaveData::FindMissionById(Mission::KARLOS_MISSION)->missionState != (int)MissionState::UNAVAILABLE;
@@ -61,6 +164,23 @@ void GameHandler::OnChunkLoaded() {
 			*(int*)(cassopolisDoor + 0x16C) = shouldOpen ? 2 : 4;
 	}
 	API::LogPluginMessage("OnChunkLoaded");
+}
+
+bool GameHandler::IsSaveSelected()
+{
+	return *(int*)(Core::moduleBase + 0x4903FC) != -1;
+}
+
+void GameHandler::OnSelectBunyip(UIElementStruct* buttonsPtr)
+{
+	if (buttonsPtr->firstChildUiElement == nullptr || buttonsPtr->firstChildUiElement->TypeName == NULL)
+		return;
+	auto buttonChildName = std::string(buttonsPtr->firstChildUiElement->TypeName);
+	API::LogPluginMessage("Button selected: " + buttonChildName);
+	if (buttonChildName != "ButtonUsePrimary")
+		return;
+	selectedBunyip = *reinterpret_cast<Bunyip*>(reinterpret_cast<char*>(buttonsPtr) + 0x504);
+	API::LogPluginMessage("Bunyip selected: " + std::to_string((int)selectedBunyip));
 }
 
 int __stdcall GameHandler::CanActivateMission(uintptr_t* missionPtr)

@@ -81,7 +81,7 @@ private:
         {"Titanium Bolt", "AP_TitaniumBolt"},
         {"Strawberry", "AP_Strawberry"},
         {"Golden Cog", "AP_GoldenCog"},
-        {"Picture Frame", "fe_700_Frames.dds"},
+        {"Picture Frame", "fe_999_totalpicture"},
 
         {"Fire Thunder Egg", "AP_ThunderEgg"},
         {"Ice Thunder Egg", "AP_ThunderEgg"},

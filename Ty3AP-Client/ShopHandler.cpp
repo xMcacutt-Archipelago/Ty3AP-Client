@@ -75,29 +75,7 @@ void ShopHandler::SetShopItems() {
 	for (auto itemIndex = 0; itemIndex < rangShop->itemCount; itemIndex++) {
 		auto item = rangShop->items[itemIndex];
 		switch (item->currencyType) {
-		case 0:
-		{
-			std::lock_guard<std::mutex> lock(IDtoCostMutex);
-			auto it = IDtoCost.find(item->itemId);
-			if (it != IDtoCost.end()) {
-				item->baseCost = it->second;
-			}
-			break;
-		}
-		case 1:
-			item->baseCost = (indexCurrency1 + 1) * 3;
-			indexCurrency1++;
-			break;
-		}
-		ShopHandler::GetShopItemName(item->titleId, false);
-	}
-
-	auto cassopolisShop = SaveData::FindShopById(Shop::CASSOPOLIS);
-	for (auto itemIndex = 0; itemIndex < cassopolisShop->itemCount; itemIndex++) {
-		auto item = cassopolisShop->items[itemIndex];
-		ShopHandler::GetShopItemName(item->titleId, false);
-		if (item->currencyType == 0)
-		{
+			case 0:
 			{
 				std::lock_guard<std::mutex> lock(IDtoCostMutex);
 				auto it = IDtoCost.find(item->itemId);
@@ -106,7 +84,32 @@ void ShopHandler::SetShopItems() {
 				}
 				break;
 			}
+			case 1:
+				item->baseCost = (indexCurrency1 + 1) * 3;
+				indexCurrency1++;
+				break;
 		}
+		ShopHandler::GetShopItemName(item->titleId, false);
+		if (ArchipelagoHandler::IsLocationChecked(0x6900 + item->itemId))
+			item->maxNumPurchased = 0;
+	}
+
+	auto cassopolisShop = SaveData::FindShopById(Shop::CASSOPOLIS);
+	for (auto itemIndex = 0; itemIndex < cassopolisShop->itemCount; itemIndex++) {
+		auto item = cassopolisShop->items[itemIndex];
+		if (item->currencyType == 0)
+		{
+			{
+				std::lock_guard<std::mutex> lock(IDtoCostMutex);
+				auto it = IDtoCost.find(item->itemId);
+				if (it != IDtoCost.end()) {
+					item->baseCost = it->second;
+				}
+			}
+		}
+		ShopHandler::GetShopItemName(item->titleId, false);
+		if (ArchipelagoHandler::IsLocationChecked(0x6900 + item->itemId))
+			item->maxNumPurchased = 0;
 	}
 
 	auto mobileHQ = SaveData::FindShopById(Shop::MOBILE_HQ);
@@ -133,6 +136,8 @@ void ShopHandler::SetShopItems() {
 			break;
 		}
 		ShopHandler::GetShopItemName(item->titleId, false);
+		if (ArchipelagoHandler::IsLocationChecked(0x6900 + item->itemId))
+			item->maxNumPurchased = 0;
 	}
 
 	auto secretShop = SaveData::FindShopById(Shop::SECRET_SHOP);
@@ -147,9 +152,10 @@ void ShopHandler::SetShopItems() {
 				if (it != IDtoCost.end()) {
 					item->baseCost = it->second;
 				}
-				break;
 			}
 		}
+		if (ArchipelagoHandler::IsLocationChecked(0x6900 + item->itemId))
+			item->maxNumPurchased = 0;
 	}
 }
 
@@ -158,6 +164,9 @@ void ShopHandler::FillShopItemNames(const std::list<APClient::NetworkItem>& item
 	for (const APClient::NetworkItem& netItem : items) {
 		auto itemId = netItem.location & 0xFF;
 		ItemStruct* shopItem = SaveData::FindItemById(itemId);
+
+		if (std::find(validShopItems.begin(), validShopItems.end(), itemId) == validShopItems.end())
+			continue;
 
 		if (!shopItem) {
 			API::LogPluginMessage("Invalid id: " + std::to_string(itemId));

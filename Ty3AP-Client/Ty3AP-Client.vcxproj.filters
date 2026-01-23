@@ -90,6 +90,24 @@
     <ClInclude Include="Shop.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="TrackerWindow.h">
+      <Filter>Header Files\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="stb_image.h">
+      <Filter>Header Files\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="RobotoMedium.hpp">
+      <Filter>Header Files\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="InfoWindow.h">
+      <Filter>Header Files\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="collectible_info.h">
+      <Filter>Header Files\UI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -158,6 +176,12 @@
     <ClCompile Include="SaveDataHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="TrackerWindow.cpp">
+      <Filter>Source Files\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="InfoWindow.cpp">
+      <Filter>Source Files\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Source.def">
@@ -166,6 +190,61 @@
     <None Include="mod_info.json" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="info.txt" />
+    <ResourceCompile Include="Ty3AP-Client.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="icon1.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resource\Bunyip.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resource\Crab.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resource\Duke.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resource\Gate.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resource\Gauntlet.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resource\Gunyip.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resource\Karlos.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resource\Mission.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resource\Quinking.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resource\Race.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resource\ShadowChassis.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resource\ShadowStone.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resource\Sly.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resource\Story.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resource\icon.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resource\Level.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

@@ -15,14 +15,14 @@ void CheckHandler::OnCompleteMission(void* missionPtr, int status) {
 	auto* mission = reinterpret_cast<MissionStruct*>(reinterpret_cast<char*>(missionPtr));
 	int id = mission->missionId & 0xffff;
 
+	if (id == Mission::QUINKING_PRE) {
+		API::LogPluginMessage("GOALLLLL");
+		ArchipelagoHandler::Release();
+		return;
+	}
+
 	ArchipelagoHandler::SendLocation(0x6d00 + id);
 	ArchipelagoHandler::customSaveData->CheckGoal();
-
-	if (id != 34)
-		return;
-
-	API::LogPluginMessage("GOALLLLL");
-	ArchipelagoHandler::Release();
 }
 
 void CheckHandler::OnBuyItem(void* itemPtr) {

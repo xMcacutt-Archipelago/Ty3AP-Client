@@ -18,13 +18,24 @@ Once you launch the game, the client should be up and running.
 
 ## Connecting
 
-To open and close the AP client windows press F2
-
 Interacting with any window in TygerFramework requires the TygerFramework window to be open. You can toggle the TygerFramework window with F1.
+
+To open the connection window, open the TygerFramework window and click the archipelago logo in the top right of the screen.
 
 To Login, Enter the server with the port, the password, and the slot and press connect
 
 ## Functionality
+
+### The Tracker
+The tracker window is open by default but can be closed by clicking the archipelago logo in the top right of the screen and selecting Tracker Window.
+
+When the tracker window is closed, holding T will still display it.
+
+### Collectible Info
+The collectible info window can be opened by clicking the archipelago logo in the top right of the screen and selecting Collectible Info.
+
+It displays the descriptions of the position of each collectible in the game sorted by level, collectible, and index.
+
 ### Goal
 The goal is to complete a number of missions and defeat the Quinking.
 

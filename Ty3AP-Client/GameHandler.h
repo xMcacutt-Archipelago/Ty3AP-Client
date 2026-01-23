@@ -16,6 +16,11 @@ public:
 	static void OnGameLoaded();
 	static void OnMenuLoaded();
 	static void OnChunkLoaded();
+	static bool IsSaveSelected();
+	static void OnWriteLevel(uintptr_t strPtr);
+	static void OnChunkQueued(uintptr_t chunkPtr);
+	static void OnChunkQueuedWithoutQueuer(uintptr_t chunkPtr);
+	static void OnSelectBunyip(UIElementStruct* buttonsPtr);
 	static void __fastcall OnDeath(uintptr_t* tyPtr, int edx, int state, int source);
 	static int __stdcall CanActivateMission(uintptr_t* missionPtr);
 	static inline std::list<int> gameActiveMissions = { 

@@ -24,9 +24,11 @@
     <ClInclude Include="APSaveData.h" />
     <ClInclude Include="ArchipelagoHandler.h" />
     <ClInclude Include="CheckHandler.h" />
+    <ClInclude Include="collectible_info.h" />
     <ClInclude Include="GameHandler.h" />
     <ClInclude Include="gui.h" />
     <ClInclude Include="Hooks.h" />
+    <ClInclude Include="InfoWindow.h" />
     <ClInclude Include="Item.h" />
     <ClInclude Include="ItemHandler.h" />
     <ClInclude Include="LoggerWindow.h" />
@@ -34,10 +36,14 @@
     <ClInclude Include="LoginWindow.h" />
     <ClInclude Include="Mission.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="RobotoMedium.hpp" />
     <ClInclude Include="SaveDataHandler.h" />
     <ClInclude Include="Shop.h" />
     <ClInclude Include="ShopHandler.h" />
     <ClInclude Include="SlotData.h" />
+    <ClInclude Include="stb_image.h" />
+    <ClInclude Include="TrackerWindow.h" />
     <ClInclude Include="Version.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
@@ -70,6 +76,7 @@
     <ClCompile Include="GameHandler.cpp" />
     <ClCompile Include="gui.cpp" />
     <ClCompile Include="Hooks.cpp" />
+    <ClCompile Include="InfoWindow.cpp" />
     <ClCompile Include="ItemHandler.cpp" />
     <ClCompile Include="LoggerWindow.cpp" />
     <ClCompile Include="LoginHandler.cpp" />
@@ -80,10 +87,33 @@
     <ClCompile Include="SaveDataHandler.cpp" />
     <ClCompile Include="ShopHandler.cpp" />
     <ClCompile Include="SlotData.cpp" />
+    <ClCompile Include="TrackerWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="mod_info.json" />
     <None Include="Source.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Ty3AP-Client.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="icon1.ico" />
+    <Image Include="resource\Bunyip.png" />
+    <Image Include="resource\Crab.png" />
+    <Image Include="resource\Duke.png" />
+    <Image Include="resource\Gate.png" />
+    <Image Include="resource\Gauntlet.png" />
+    <Image Include="resource\Gunyip.png" />
+    <Image Include="resource\icon.png" />
+    <Image Include="resource\Karlos.png" />
+    <Image Include="resource\Level.png" />
+    <Image Include="resource\Mission.png" />
+    <Image Include="resource\Quinking.png" />
+    <Image Include="resource\Race.png" />
+    <Image Include="resource\ShadowChassis.png" />
+    <Image Include="resource\ShadowStone.png" />
+    <Image Include="resource\Sly.png" />
+    <Image Include="resource\Story.png" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -96,26 +126,26 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>

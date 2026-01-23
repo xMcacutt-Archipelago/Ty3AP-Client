@@ -4,6 +4,7 @@
 
 bool disabledButtons = false;
 
+MissionState previousMissionState = MissionState::UNAVAILABLE;
 void TickBeforeGame(float deltaSeconds) {
     GUI::DrawUI();
     if (SaveDataHandler::g_SaveCallback.active) {
@@ -17,6 +18,12 @@ void TickBeforeGame(float deltaSeconds) {
             }
             SaveDataHandler::g_SaveCallback.active = false;
         }
+    }
+
+    auto newMissionState = SaveData::FindMissionById(Mission::EGG_HUNT)->missionState;
+    if (newMissionState != previousMissionState) {
+        API::LogPluginMessage("Egg Hunt Status: " + std::to_string(newMissionState));
+        previousMissionState = newMissionState;
     }
 
     auto stoneConfigBaseAddr = *(uintptr_t*)(Core::moduleBase + 0x4C330C);

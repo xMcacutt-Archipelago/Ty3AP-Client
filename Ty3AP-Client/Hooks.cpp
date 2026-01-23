@@ -3,6 +3,33 @@
 
 typedef void(__stdcall* FunctionType)();
 
+FunctionType WriteLevelOrigin = nullptr;
+uintptr_t WriteLevelOriginReturnAddr;
+uintptr_t levelAddr; 
+__declspec(naked) void __stdcall Hooks::WriteLevelHook() {
+	_asm {
+		pushfd
+		push edi
+		mov edi,esp
+		add edi,0x18
+		mov edi,[edi]
+		cmp edi,levelAddr
+		jne not_writing_level
+		pushad
+		pushfd
+		push esi
+		call GameHandler::OnWriteLevel 
+		pop esi
+		popfd
+		popad 
+	not_writing_level :
+		pop edi
+		popfd
+		test esi,0x3
+		jmp dword ptr[WriteLevelOriginReturnAddr]
+	}
+}
+
 FunctionType GameLoadedOrigin = nullptr;
 uintptr_t GameLoadedOriginReturnAddr;
 __declspec(naked) void __stdcall Hooks::GameLoadedHook() {
@@ -130,6 +157,22 @@ __declspec(naked) void __stdcall Hooks::GetShadowPieceHook() {
 	}
 }
 
+FunctionType SelectBunyipOrigin = nullptr;
+uintptr_t SelectBunyipOriginReturnAddr;
+__declspec(naked) void __stdcall Hooks::SelectBunyipHook() {
+	_asm {
+		pushad
+		pushfd
+		push edi
+		call GameHandler::OnSelectBunyip
+		pop edi
+		popfd
+		popad
+		push [edi+0x504]
+		jmp dword ptr[SelectBunyipOriginReturnAddr]
+	}
+}
+
 FunctionType LoadSaveFileOrigin = nullptr;
 uintptr_t LoadSaveFileOriginReturnAddr;
 __declspec(naked) void __stdcall Hooks::LoadSaveFileHook() {
@@ -194,6 +237,46 @@ __declspec(naked) void __stdcall Hooks::ChunkLoadedHook() {
 	}
 }
 
+FunctionType ChunkQueuedOrigin = nullptr;
+uintptr_t ChunkQueuedOriginReturnAddr;
+__declspec(naked) void __stdcall Hooks::ChunkQueuedHook() {
+	_asm {
+		pushfd
+		pushad
+		mov edi, esp
+		add edi,0x24
+		mov edi,[edi]
+		mov edi,[edi]
+		push edi
+		call GameHandler::OnChunkQueued
+		pop edi   
+		popad
+		popfd
+		mov al,01
+		pop esi
+		pop edi
+		pop ebx
+		jmp dword ptr[ChunkQueuedOriginReturnAddr]
+	}
+}
+
+FunctionType ChunkQueuedWithoutQueuerOrigin = nullptr;
+uintptr_t ChunkQueuedWithoutQueuerOriginReturnAddr;
+__declspec(naked) void __stdcall Hooks::ChunkQueuedWithoutQueuerHook() {
+	_asm {
+		add esp,0x10
+		pushfd
+		pushad
+		push esi
+		call GameHandler::OnChunkQueuedWithoutQueuer
+		pop esi
+		popad
+		popfd
+		mov al, 01
+		jmp dword ptr[ChunkQueuedWithoutQueuerOriginReturnAddr]
+	}
+}
+
 FunctionType FindItemOrigin = nullptr;
 uintptr_t FindItemOriginReturnAddr;
 __declspec(naked) void __stdcall Hooks::FindItemHook() {
@@ -209,6 +292,8 @@ __declspec(naked) void __stdcall Hooks::FindItemHook() {
 		jmp dword ptr[FindItemOriginReturnAddr]
 	}
 }
+
+
 
 void Hooks::SetupHooks() {
 	char* addr;
@@ -258,6 +343,16 @@ void Hooks::SetupHooks() {
 	addr = (char*)(Core::moduleBase + 0x18DBCA);
 	MH_CreateHook((LPVOID)addr, &ChunkLoadedHook, reinterpret_cast<LPVOID*>(&ChunkLoadedOrigin));
 
+	ChunkQueuedOriginReturnAddr = Core::moduleBase + 0x11ab4b + 5;
+	addr = (char*)(Core::moduleBase + 0x11ab4b);
+	MH_CreateHook((LPVOID)addr, &ChunkQueuedHook, reinterpret_cast<LPVOID*>(&ChunkQueuedOrigin));
+	// esp + 4 contains current chunk
+	// esp + 24 contains connecting chunk
+
+	ChunkQueuedWithoutQueuerOriginReturnAddr = Core::moduleBase + 0x11aae7 + 5;
+	addr = (char*)(Core::moduleBase + 0x11aae7);
+	MH_CreateHook((LPVOID)addr, &ChunkQueuedWithoutQueuerHook, reinterpret_cast<LPVOID*>(&ChunkQueuedWithoutQueuerOrigin));
+
 	addr = (char*)(Core::moduleBase + 0x1608C0);
 	MH_CreateHook((LPVOID)addr, &GameHandler::OnDeath, reinterpret_cast<void**>(&GameHandler::stateTransitionFunc));
 
@@ -267,6 +362,15 @@ void Hooks::SetupHooks() {
 	GetShadowPieceOriginReturnAddr = Core::moduleBase + 0x18a827;
 	addr = (char*)(Core::moduleBase + 0x18a81d);
 	MH_CreateHook((LPVOID)addr, &Hooks::GetShadowPieceHook, reinterpret_cast<void**>(&GetShadowPieceOrigin));
+
+	SelectBunyipOriginReturnAddr = Core::moduleBase + 0x391bbb;
+	addr = (char*)(Core::moduleBase + 0x391bb5);
+	MH_CreateHook((LPVOID)addr, &Hooks::SelectBunyipHook, reinterpret_cast<void**>(&SelectBunyipOrigin));
+
+	WriteLevelOriginReturnAddr = Core::moduleBase + 0x3bfb4b;
+	levelAddr = Core::moduleBase + 0xEB9C90;
+	addr = (char*)(Core::moduleBase + 0x3bfb45);
+	MH_CreateHook((LPVOID)addr, &Hooks::WriteLevelHook, reinterpret_cast<void**>(&WriteLevelOrigin));
 
 	GameHandler::SetToNoOperation((uintptr_t*)(Core::moduleBase + 0x3470A5), 26);
 	GameHandler::SetToJmp((uintptr_t*)(Core::moduleBase + 0x3470E8));
@@ -286,4 +390,6 @@ void Hooks::SetupHooks() {
 
 	// Prevent ever adding to the spent count of non-opal currencies
 	GameHandler::SetToNoOperation((uintptr_t*)(Core::moduleBase + 0x1db72d), 6);
+	GameHandler::SetToNoOperation((uintptr_t*)(Core::moduleBase + 0x1db77d), 6);
+	GameHandler::SetToNoOperation((uintptr_t*)(Core::moduleBase + 0x1db6cf), 6);
 }

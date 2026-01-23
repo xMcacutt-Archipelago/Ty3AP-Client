@@ -1,5 +1,6 @@
 #pragma once
 #include "ArchipelagoHandler.h"
+#include "SlotData.h"
 #include "CheckHandler.h"
 #include "APSaveData.h"
 #include "ShopHandler.h"

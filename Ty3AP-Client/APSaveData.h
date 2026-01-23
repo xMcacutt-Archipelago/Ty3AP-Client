@@ -19,12 +19,28 @@ public:
 	int orbCount = 0;
 	int bilbyCount = 0;
 	bool hasUnlockedDuke = false;
+	bool hasUnlockedSly = false;
+	bool hasUnlockedKarlos = false;
+	bool hasSouthernRiversGate = false;
+	bool hasCrab = false;
+	bool hasUnlockedFinal = false;
 	bool hasUnlockedKakaboom = false;
 	bool hasUnlockedBasin = false;
 	bool hasUnlockedCinder = false;
+	bool hasUnlockedGully = false;
+	bool hasUnlockedMarsh = false;
 	int shadowStoneCount = 0;
 	bool hasShadowChassis = false;
 	bool hasGauntlet = false;
+	std::map<Mission, MissionState> savedBunyipStatuses = {
+		{ Mission::QUINKAN_ARMADA, MissionState::UNAVAILABLE },
+		{ Mission::EGG_HUNT, MissionState::UNAVAILABLE },
+		{ Mission::POWER_STRUGGLE, MissionState::UNAVAILABLE },
+		{ Mission::MELTDOWN, MissionState::UNAVAILABLE } ,
+		{ Mission::RANGER_ENDANGER, MissionState::UNAVAILABLE },
+		{ Mission::REDBACK_RUNDOWN, MissionState::UNAVAILABLE },
+	};
+
 	std::map<int, bool> ItemMap = {
 		
 	};

@@ -117,6 +117,11 @@ void SaveDataHandler::write_json_file(const std::string& filename) {
 	j["BilbyCount"] = SaveData::GetData()->bilbiesCollected;
 	j["ShopData"] = ArchipelagoHandler::customSaveData->ItemMap;
 	j["UnlockedDuke"] = ArchipelagoHandler::customSaveData->hasUnlockedDuke;
+	j["UnlockedSly"] = ArchipelagoHandler::customSaveData->hasUnlockedSly;
+	j["UnlockedKarlos"] = ArchipelagoHandler::customSaveData->hasUnlockedKarlos;
+	j["UnlockedFinal"] = ArchipelagoHandler::customSaveData->hasUnlockedFinal;
+	j["UnlockedGate"] = ArchipelagoHandler::customSaveData->hasSouthernRiversGate;
+	j["HasCrab"] = ArchipelagoHandler::customSaveData->hasCrab;
 	j["UnlockedKakaboom"] = ArchipelagoHandler::customSaveData->hasUnlockedKakaboom;
 	j["UnlockedBasin"] = ArchipelagoHandler::customSaveData->hasUnlockedBasin;
 	j["UnlockedCinder"] = ArchipelagoHandler::customSaveData->hasUnlockedCinder;
@@ -124,6 +129,9 @@ void SaveDataHandler::write_json_file(const std::string& filename) {
 	j["ShadowStones"] = ArchipelagoHandler::customSaveData->shadowStoneCount;
 	j["HasGauntlet"] = ArchipelagoHandler::customSaveData->hasGauntlet;
 	j["AllowedActiveMissions"] = ArchipelagoHandler::customSaveData->allowedActiveMissions;
+	j["BunyipMissionStatuses"] = ArchipelagoHandler::customSaveData->savedBunyipStatuses;
+	j["HasUnlockedGully"] = ArchipelagoHandler::customSaveData->hasUnlockedGully;
+	j["HasUnlockedMarsh"] = ArchipelagoHandler::customSaveData->hasUnlockedMarsh;
 
 	// Write to file
 	std::ofstream file(filename);
@@ -152,6 +160,11 @@ void SaveDataHandler::read_json_file(const std::string& filename) {
 	ArchipelagoHandler::customSaveData->bilbyCount = j["BilbyCount"];
 	ArchipelagoHandler::customSaveData->ItemMap = j["ShopData"].get<std::map<int, bool>>();
 	ArchipelagoHandler::customSaveData->hasUnlockedDuke = j["UnlockedDuke"] == 1;
+	ArchipelagoHandler::customSaveData->hasUnlockedSly = j["UnlockedSly"] == 1;
+	ArchipelagoHandler::customSaveData->hasUnlockedKarlos = j["UnlockedKarlos"] == 1;
+	ArchipelagoHandler::customSaveData->hasUnlockedFinal = j["UnlockedFinal"] == 1;
+	ArchipelagoHandler::customSaveData->hasSouthernRiversGate = j["UnlockedGate"] == 1;
+	ArchipelagoHandler::customSaveData->hasCrab = j["HasCrab"] == 1;
 	ArchipelagoHandler::customSaveData->hasUnlockedKakaboom = j["UnlockedKakaboom"] == 1;
 	ArchipelagoHandler::customSaveData->hasUnlockedBasin = j["UnlockedBasin"] == 1;
 	ArchipelagoHandler::customSaveData->hasUnlockedCinder = j["UnlockedCinder"] == 1;
@@ -159,6 +172,9 @@ void SaveDataHandler::read_json_file(const std::string& filename) {
 	ArchipelagoHandler::customSaveData->shadowStoneCount = j["ShadowStones"];
 	ArchipelagoHandler::customSaveData->hasGauntlet = j["HasGauntlet"] == 1;
 	ArchipelagoHandler::customSaveData->allowedActiveMissions = j["AllowedActiveMissions"].get<std::set<int>>();
+	ArchipelagoHandler::customSaveData->savedBunyipStatuses = j["BunyipMissionStatuses"];
+	ArchipelagoHandler::customSaveData->hasUnlockedGully = j["HasUnlockedGully"] == 1;
+	ArchipelagoHandler::customSaveData->hasUnlockedMarsh = j["HasUnlockedMarsh"] == 1;
 }
 
 bool SaveDataHandler::hasRunSetup = false;

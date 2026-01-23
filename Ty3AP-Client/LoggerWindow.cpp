@@ -5,7 +5,7 @@ void LoggerWindow::ToggleVisibility() {
     isVisible = !isVisible;
 }
 
-void LoggerWindow::Draw(int outerWidth, int outerHeight, float uiScale, ImFont* font) {
+void LoggerWindow::Draw(int outerWidth, int outerHeight, float uiScale) {
     if (!isVisible)
         return;
 
@@ -15,10 +15,7 @@ void LoggerWindow::Draw(int outerWidth, int outerHeight, float uiScale, ImFont* 
     ImGui::SetNextWindowPos(ImVec2(10, outerHeight - 500 - 10), ImGuiCond_Always);
     ImGui::SetNextWindowSize(ImVec2(500, 500), ImGuiCond_Always);
     ImGui::Begin(name.c_str(), nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar);
-    
-    if (font) {
-        ImGui::PushFont(font);
-    }
+    ImGui::SetWindowFontScale(uiScale + 0.3f);
 
     // Get the window draw list for custom drawing
     ImDrawList* draw_list = ImGui::GetWindowDrawList();
@@ -94,31 +91,13 @@ void LoggerWindow::Draw(int outerWidth, int outerHeight, float uiScale, ImFont* 
         // Add space between messages for separation
         y_pos -= 5.0f;  // Adjust this space for gap between messages
     }
-    if (font) {
-        ImGui::PopFont();
-    }
     ImGui::End();
 }
 
 // Function to remove color tags from the text
 std::string LoggerWindow::RemoveColorTags(const std::string& text) {
-    std::string result;
-    result.reserve(text.size());
-
-    bool insideTag = false;
-    for (size_t i = 0; i < text.size(); ++i) {
-        if (text[i] == '[') {
-            insideTag = true;
-        }
-        else if (text[i] == ']') {
-            insideTag = false;
-        }
-        else if (!insideTag) {
-            result += text[i];
-        }
-    }
-
-    return result;
+    static const std::regex colorTag(R"(\[color\s*=\s*[0-9a-fA-F]{8}\])");
+    return std::regex_replace(text, colorTag, "");
 }
 
 void LoggerWindow::RenderFormattedText(ImDrawList* draw_list, const char* text, ImVec2 pos) {
@@ -135,7 +114,7 @@ void LoggerWindow::RenderFormattedText(ImDrawList* draw_list, const char* text, 
         {"Multi Stone", IM_COL32(0xFF, 0x8C, 0x00, 0xFF)},
         {"Zoom Stone", IM_COL32(0x9B, 0x94, 0xD6, 0xFF)},
         {"Magnet Stone", IM_COL32(0xFC, 0xC1, 0x92, 0xFF)},
-        {"Shadow Stone", IM_COL32(0x09, 0x00, 0x5E, 0xFF)},
+        {"Shadow Stone", IM_COL32(0x99, 0x66, 0xff, 0xFF)},
         {"Kromium Orb", IM_COL32(0xFF, 0x00, 0x00, 0xFF)},
         {"Gooboo Berry", IM_COL32(0xF2, 0x03, 0xFF, 0xFF)},
         {"Bilby", IM_COL32(0x73, 0x91, 0xFF, 0xFF)},
@@ -182,30 +161,30 @@ void LoggerWindow::RenderFormattedText(ImDrawList* draw_list, const char* text, 
     const char* segment_start = text;
     const char* s = text;
     float x_pos = pos.x;
+    std::cmatch match;
 
+    static const std::regex colorTag(R"(\[color\s*=\s*([0-9a-fA-F]{8})\])");
     while (*s) {
-        // Check for color tag "[color=XXXXXX]"
-        if (*s == '[' && *(s + 1) == 'c' && strncmp(s, "[color=", 7) == 0) {
+        if (std::regex_search(s, match, colorTag)) {
             if (segment_start < s) {
                 draw_list->AddText(ImVec2(x_pos, pos.y), current_color, segment_start, s);
                 x_pos += ImGui::CalcTextSize(segment_start, s).x;
             }
+        
+            unsigned int rgba;
+            sscanf_s(match[1].first, "%8x", &rgba);
+            unsigned int r = (rgba >> 24) & 0xFF;
+            unsigned int g = (rgba >> 16) & 0xFF;
+            unsigned int b = (rgba >> 8) & 0xFF;
+            unsigned int a = (rgba >> 0) & 0xFF;
+            ImU32 color = IM_COL32(r, g, b, a);
+            s = match[0].second;
 
-            // Parse color code
-            s += 7; // Skip "[color="
-            unsigned int r, g, b, a = 255;
-            if (sscanf_s(s, "%2x%2x%2x%2x", &r, &g, &b, &a) >= 3) {
-                current_color = IM_COL32(r, g, b, a);
-            }
-
-            // Move past the color tag
-            while (*s && *s != ']') s++;
-            if (*s == ']') s++;
             segment_start = s;
             continue;
         }
 
-        // Check for keywords and apply coloring
+        bool keyword_hit = false;
         for (const auto& [keyword, color] : keywordColors) {
             size_t len = keyword.length();
             if (compareStrings(s, keyword.c_str(), len) && (s[len] == ' ' || s[len] == '\0')) {
@@ -214,23 +193,23 @@ void LoggerWindow::RenderFormattedText(ImDrawList* draw_list, const char* text, 
                     draw_list->AddText(ImVec2(x_pos, pos.y), current_color, segment_start, s);
                     x_pos += ImGui::CalcTextSize(segment_start, s).x;
                 }
-
                 // Draw keyword in highlighted color
                 draw_list->AddText(ImVec2(x_pos, pos.y), color, s, s + len);
                 x_pos += ImGui::CalcTextSize(s, s + len).x;
-
                 s += len;
                 segment_start = s;
+                keyword_hit = true;
                 break; // Restart loop from new position
             }
-        }
-
+		}
+        if (keyword_hit)
+            continue;
+    
         s++;
     }
-
-    // Draw remaining text
     if (segment_start < s) {
         draw_list->AddText(ImVec2(x_pos, pos.y), current_color, segment_start, s);
+        x_pos += ImGui::CalcTextSize(segment_start, s).x;
     }
 }
 

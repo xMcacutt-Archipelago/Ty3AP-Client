@@ -16,8 +16,12 @@ private:
 	static void __stdcall RecalcSaveDataSize2Hook();
 	static void __stdcall SaveFileHook();
 	static void __stdcall ChunkLoadedHook();
+	static void __stdcall ChunkQueuedHook();
+	static void __stdcall ChunkQueuedWithoutQueuerHook();
 	static void __stdcall FindItemHook();
 	static void __stdcall GetShadowPieceHook();
+	static void __stdcall SelectBunyipHook();
+	static void __stdcall WriteLevelHook();
 public:
 	static void SetupHooks();
 };

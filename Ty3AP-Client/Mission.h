@@ -1,4 +1,11 @@
 #pragma once
+#include "nlohmann/json.hpp"
+#include "SaveData.h"
+
+enum Bunyip : int {
+    SHADOW = 0,
+    EXTREME = 1
+};
 
 enum Mission : int {
 	SAVE_THE_DREAMING = 1,
@@ -29,7 +36,8 @@ enum Mission : int {
     AERO_COAST_GUARD = 21,
     WRATH_OF_THE_DRAGONQUIN = 22,
     FOREST_FIREPOWER = 31,
-    QUINKING = 33,
+    QUINKING = 34,
+    QUINKING_PRE = 33,
     KARLOS_MISSION = 84,
     CRAB_MISSION = 83,
     SLY_MISSION = 82,
@@ -37,3 +45,20 @@ enum Mission : int {
     SWAMP_MISSION = 80,
     CRAB_INTRO = 99,
 };
+
+NLOHMANN_JSON_SERIALIZE_ENUM(Mission, {
+    {Mission::QUINKAN_ARMADA, "QUINKAN_ARMADA"},
+    {Mission::EGG_HUNT, "EGG_HUNT"},
+    {Mission::POWER_STRUGGLE, "POWER_STRUGGLE"},
+    {Mission::MELTDOWN, "MELTDOWN"},
+    {Mission::RANGER_ENDANGER, "RANGER_ENDANGER"},
+    {Mission::REDBACK_RUNDOWN, "REDBACK_RUNDOWN"},
+});
+
+NLOHMANN_JSON_SERIALIZE_ENUM(MissionState, {
+    {MissionState::UNAVAILABLE, "UNAVAILABLE"},
+    {MissionState::AVAILABLE, "AVAILABLE"},
+	{MissionState::ACTIVE, "ACTIVE"},
+	{MissionState::REPLAYABLE, "REPLAYABLE"},
+    {MissionState::COMPLETE, "COMPLETED"},
+});

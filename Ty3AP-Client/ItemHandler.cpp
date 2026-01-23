@@ -6,12 +6,11 @@ std::queue<APClient::NetworkItem> ItemHandler::storedItems;
 
 void ItemHandler::HandleItem(APClient::NetworkItem item)
 {
-	if (!GameState::IsInGame()) {
-		storedItems.push(item);
+	if (!GameHandler::IsSaveSelected()) {
+        storedItems.push(item);
 		return;
 	}
 
-	API::LogPluginMessage("lastindex: " + std::to_string(ArchipelagoHandler::customSaveData->pLastReceivedIndex) + " index: " + std::to_string(item.index));
 	if (item.index <= ArchipelagoHandler::customSaveData->pLastReceivedIndex) {
 		return;
 	}
@@ -20,21 +19,23 @@ void ItemHandler::HandleItem(APClient::NetworkItem item)
 
     switch (item.item) {
     case Ty3Item::Sly:
+		ArchipelagoHandler::customSaveData->hasUnlockedSly = true;
         SaveData::FindMissionById(Mission::SLY_MISSION)->missionState = MissionState::COMPLETE;
         SaveData::FindMissionById(Mission::QUINKAN_ARMADA)->missionState = MissionState::AVAILABLE;
-        ArchipelagoHandler::customSaveData->allowedActiveMissions.insert(Mission::QUINKAN_ARMADA);
+		ArchipelagoHandler::customSaveData->savedBunyipStatuses[Mission::QUINKAN_ARMADA] = MissionState::AVAILABLE;
         SaveData::FindMissionById(Mission::EGG_HUNT)->missionState = MissionState::AVAILABLE;
-        ArchipelagoHandler::customSaveData->allowedActiveMissions.insert(Mission::EGG_HUNT);
+		ArchipelagoHandler::customSaveData->savedBunyipStatuses[Mission::EGG_HUNT] = MissionState::AVAILABLE;
         SaveData::FindMissionById(Mission::POWER_STRUGGLE)->missionState = MissionState::AVAILABLE;
-        ArchipelagoHandler::customSaveData->allowedActiveMissions.insert(Mission::POWER_STRUGGLE);
+		ArchipelagoHandler::customSaveData->savedBunyipStatuses[Mission::POWER_STRUGGLE] = MissionState::AVAILABLE;
         SaveData::FindMissionById(Mission::MELTDOWN)->missionState = MissionState::AVAILABLE;
-        ArchipelagoHandler::customSaveData->allowedActiveMissions.insert(Mission::MELTDOWN);
+		ArchipelagoHandler::customSaveData->savedBunyipStatuses[Mission::MELTDOWN] = MissionState::AVAILABLE;
         SaveData::FindMissionById(Mission::RANGER_ENDANGER)->missionState = MissionState::AVAILABLE;
-        ArchipelagoHandler::customSaveData->allowedActiveMissions.insert(Mission::RANGER_ENDANGER);
+		ArchipelagoHandler::customSaveData->savedBunyipStatuses[Mission::RANGER_ENDANGER] = MissionState::AVAILABLE;
         SaveData::FindMissionById(Mission::REDBACK_RUNDOWN)->missionState = MissionState::AVAILABLE;
-        ArchipelagoHandler::customSaveData->allowedActiveMissions.insert(Mission::REDBACK_RUNDOWN);
+		ArchipelagoHandler::customSaveData->savedBunyipStatuses[Mission::REDBACK_RUNDOWN] = MissionState::AVAILABLE;
         break;
     case Ty3Item::Duke:
+		ArchipelagoHandler::customSaveData->hasUnlockedDuke = true;
         SaveData::FindMissionById(Mission::DUKE_MISSION)->missionState = MissionState::COMPLETE;
 		SaveData::FindMissionById(Mission::WRATH_OF_THE_DRAGONQUIN)->missionState = MissionState::AVAILABLE;
         ArchipelagoHandler::customSaveData->allowedActiveMissions.insert(Mission::WRATH_OF_THE_DRAGONQUIN);
@@ -44,7 +45,6 @@ void ItemHandler::HandleItem(APClient::NetworkItem item)
         ArchipelagoHandler::customSaveData->allowedActiveMissions.insert(Mission::AERO_COAST_GUARD);
         SaveData::FindMissionById(Mission::FOREST_FIREPOWER)->missionState = MissionState::AVAILABLE;
         ArchipelagoHandler::customSaveData->allowedActiveMissions.insert(Mission::FOREST_FIREPOWER);
-        ArchipelagoHandler::customSaveData->hasUnlockedDuke = true;
         if (ArchipelagoHandler::customSaveData->hasUnlockedBasin) {
 			SaveData::FindMissionById(Mission::FIND_THE_SHADOWRING)->missionState = MissionState::ACTIVE;
             ArchipelagoHandler::customSaveData->allowedActiveMissions.insert(Mission::FIND_THE_SHADOWRING);
@@ -59,6 +59,7 @@ void ItemHandler::HandleItem(APClient::NetworkItem item)
         }
         break;
     case Ty3Item::Karlos:
+		ArchipelagoHandler::customSaveData->hasUnlockedKarlos = true;
         SaveData::FindMissionById(Mission::KARLOS_MISSION)->missionState = MissionState::COMPLETE;
         SaveData::FindMissionById(Mission::BATTLE_ARENA_GAMMA)->missionState = MissionState::AVAILABLE;
         ArchipelagoHandler::customSaveData->allowedActiveMissions.insert(Mission::BATTLE_ARENA_GAMMA);
@@ -69,10 +70,12 @@ void ItemHandler::HandleItem(APClient::NetworkItem item)
         GameHandler::OnChunkLoaded();
         break;
     case Ty3Item::Crabmersible:
+		ArchipelagoHandler::customSaveData->hasCrab = true;
         SaveData::FindMissionById(Mission::CRAB_MISSION)->missionState = MissionState::COMPLETE;
         SaveData::FindMissionById(Mission::CRAB_INTRO)->missionState = MissionState::COMPLETE;
         break;
     case Ty3Item::SouthernRiversGate:
+		ArchipelagoHandler::customSaveData->hasSouthernRiversGate = true;
         SaveData::FindMissionById(Mission::SWAMP_MISSION)->missionState = MissionState::COMPLETE;
         break;
     case Ty3Item::CinderCanyon:
@@ -83,10 +86,12 @@ void ItemHandler::HandleItem(APClient::NetworkItem item)
         }
         break;
     case Ty3Item::DeadDingoMarsh:
+        ArchipelagoHandler::customSaveData->hasUnlockedMarsh = true;
         SaveData::FindMissionById(Mission::MEET_SHAZZA)->missionState = MissionState::ACTIVE;
         ArchipelagoHandler::customSaveData->allowedActiveMissions.insert(Mission::MEET_SHAZZA);
         break;
     case Ty3Item::GoobooGully:
+		ArchipelagoHandler::customSaveData->hasUnlockedGully = true;
         SaveData::FindMissionById(Mission::THE_SEARCH_FOR_STEVE)->missionState = MissionState::ACTIVE;
         ArchipelagoHandler::customSaveData->allowedActiveMissions.insert(Mission::THE_SEARCH_FOR_STEVE);
         break;
@@ -257,8 +262,12 @@ void ItemHandler::HandleItem(APClient::NetworkItem item)
 
 void ItemHandler::HandleStoredItems()
 {
-	while (!storedItems.empty() && GameState::IsInGame()) {
-		HandleItem(storedItems.front());
+	if (!GameHandler::IsSaveSelected()) {
+		API::LogPluginMessage("Cannot handle stored items, not in game\n", LogLevel::Info);
+    }
+	while (!storedItems.empty() && GameHandler::IsSaveSelected()) {
+        
+        HandleItem(storedItems.front());
 		storedItems.pop();
 	}
 }
