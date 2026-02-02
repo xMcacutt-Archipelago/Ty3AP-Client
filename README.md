@@ -2,6 +2,15 @@
 
 For the AP world see [Ty 3 AP World](https://github.com/xMcacutt-Archipelago/Archipelago-TyTheTasmanianTiger3/releases/latest)
 
+### Automatic Installation - STRONGLY RECOMMENDED
+
+The [Ty Mod Manager](https://github.com/xMcacutt/ty_mod_manager) automatically handles setup of mods and their dependencies and keeps them up to date so you don't have to. Follow the instructions on the mod manager's readme to install and set up Ty3 in the app.
+
+Once you're set up, head over to the Mod Directory page in the left menu and install Ty3-AP-Client. All future updates can be handled by navigating to the same page and pressing the update button. Auto updates are not supported in the mod manager to avoid breaking changes from being accidentally pushed.
+
+Back in the My Mods page, simply activate the Archipelago mod and hit launch.
+Next, continue to information on connecting.
+
 ### Manual Installation
 #### Requirements:
 - [Latest Release](https://github.com/xMcacutt-Archipelago/Ty3AP-Client/releases/latest)

@@ -159,22 +159,22 @@ void SaveDataHandler::read_json_file(const std::string& filename) {
 	ArchipelagoHandler::customSaveData->orbCount = j["OrbCount"];
 	ArchipelagoHandler::customSaveData->bilbyCount = j["BilbyCount"];
 	ArchipelagoHandler::customSaveData->ItemMap = j["ShopData"].get<std::map<int, bool>>();
-	ArchipelagoHandler::customSaveData->hasUnlockedDuke = j["UnlockedDuke"] == 1;
-	ArchipelagoHandler::customSaveData->hasUnlockedSly = j["UnlockedSly"] == 1;
-	ArchipelagoHandler::customSaveData->hasUnlockedKarlos = j["UnlockedKarlos"] == 1;
-	ArchipelagoHandler::customSaveData->hasUnlockedFinal = j["UnlockedFinal"] == 1;
-	ArchipelagoHandler::customSaveData->hasSouthernRiversGate = j["UnlockedGate"] == 1;
-	ArchipelagoHandler::customSaveData->hasCrab = j["HasCrab"] == 1;
-	ArchipelagoHandler::customSaveData->hasUnlockedKakaboom = j["UnlockedKakaboom"] == 1;
-	ArchipelagoHandler::customSaveData->hasUnlockedBasin = j["UnlockedBasin"] == 1;
-	ArchipelagoHandler::customSaveData->hasUnlockedCinder = j["UnlockedCinder"] == 1;
-	ArchipelagoHandler::customSaveData->hasShadowChassis = j["HasShadowChassis"] == 1;
+	ArchipelagoHandler::customSaveData->hasUnlockedDuke = j["UnlockedDuke"].get<bool>();
+	ArchipelagoHandler::customSaveData->hasUnlockedSly = j["UnlockedSly"].get<bool>();
+	ArchipelagoHandler::customSaveData->hasUnlockedKarlos = j["UnlockedKarlos"].get<bool>();
+	ArchipelagoHandler::customSaveData->hasUnlockedFinal = j["UnlockedFinal"].get<bool>();
+	ArchipelagoHandler::customSaveData->hasSouthernRiversGate = j["UnlockedGate"].get<bool>();
+	ArchipelagoHandler::customSaveData->hasCrab = j["HasCrab"].get<bool>();
+	ArchipelagoHandler::customSaveData->hasUnlockedKakaboom = j["UnlockedKakaboom"].get<bool>();
+	ArchipelagoHandler::customSaveData->hasUnlockedBasin = j["UnlockedBasin"].get<bool>();
+	ArchipelagoHandler::customSaveData->hasUnlockedCinder = j["UnlockedCinder"].get<bool>();
+	ArchipelagoHandler::customSaveData->hasShadowChassis = j["HasShadowChassis"].get<bool>();
 	ArchipelagoHandler::customSaveData->shadowStoneCount = j["ShadowStones"];
-	ArchipelagoHandler::customSaveData->hasGauntlet = j["HasGauntlet"] == 1;
+	ArchipelagoHandler::customSaveData->hasGauntlet = j["HasGauntlet"].get<bool>();
 	ArchipelagoHandler::customSaveData->allowedActiveMissions = j["AllowedActiveMissions"].get<std::set<int>>();
 	ArchipelagoHandler::customSaveData->savedBunyipStatuses = j["BunyipMissionStatuses"];
-	ArchipelagoHandler::customSaveData->hasUnlockedGully = j["HasUnlockedGully"] == 1;
-	ArchipelagoHandler::customSaveData->hasUnlockedMarsh = j["HasUnlockedMarsh"] == 1;
+	ArchipelagoHandler::customSaveData->hasUnlockedGully = j["HasUnlockedGully"].get<bool>();
+	ArchipelagoHandler::customSaveData->hasUnlockedMarsh = j["HasUnlockedMarsh"].get<bool>();
 }
 
 bool SaveDataHandler::hasRunSetup = false;

@@ -162,7 +162,7 @@ void TrackerWindow::Draw(int outerWidth, int outerHeight, float uiScale) {
 
     cursorPos = ImGui::GetCursorScreenPos();
     b = ArchipelagoHandler::customSaveData->hasUnlockedCinder && ArchipelagoHandler::customSaveData->hasUnlockedDuke;
-    brightness = semiBright;
+    brightness = b ? semiBright : lowBright;
     tintColor = ImVec4(brightness, brightness, brightness, 1.0f);
     ImGui::ImageWithBg((ImTextureID)(intptr_t)GUI::icons["level"], ImVec2(iconSize, iconSize), ImVec2(0, 0), ImVec2(1, 1), ImVec4(0, 0, 0, 0), tintColor);
     textSize = ImGui::CalcTextSize("C");
@@ -173,7 +173,7 @@ void TrackerWindow::Draw(int outerWidth, int outerHeight, float uiScale) {
 
     cursorPos = ImGui::GetCursorScreenPos();
     b = ArchipelagoHandler::customSaveData->hasUnlockedMarsh;
-    brightness = semiBright;
+    brightness = b ? semiBright : lowBright;
     tintColor = ImVec4(brightness, brightness, brightness, 1.0f);
     ImGui::ImageWithBg((ImTextureID)(intptr_t)GUI::icons["level"], ImVec2(iconSize, iconSize), ImVec2(0, 0), ImVec2(1, 1), ImVec4(0, 0, 0, 0), tintColor);
     textSize = ImGui::CalcTextSize("D");
@@ -184,7 +184,7 @@ void TrackerWindow::Draw(int outerWidth, int outerHeight, float uiScale) {
 
     cursorPos = ImGui::GetCursorScreenPos();
     b = ArchipelagoHandler::customSaveData->hasUnlockedDuke && ArchipelagoHandler::customSaveData->hasUnlockedKakaboom;
-    brightness = semiBright;
+    brightness = b ? semiBright : lowBright;
     tintColor = ImVec4(brightness, brightness, brightness, 1.0f);
     ImGui::ImageWithBg((ImTextureID)(intptr_t)GUI::icons["level"], ImVec2(iconSize, iconSize), ImVec2(0, 0), ImVec2(1, 1), ImVec4(0, 0, 0, 0), tintColor);
     textSize = ImGui::CalcTextSize("K");
@@ -195,7 +195,7 @@ void TrackerWindow::Draw(int outerWidth, int outerHeight, float uiScale) {
 
     cursorPos = ImGui::GetCursorScreenPos();
     b = ArchipelagoHandler::customSaveData->hasUnlockedGully;
-    brightness = semiBright;
+    brightness = b ? semiBright : lowBright;
     tintColor = ImVec4(brightness, brightness, brightness, 1.0f);
     ImGui::ImageWithBg((ImTextureID)(intptr_t)GUI::icons["level"], ImVec2(iconSize, iconSize), ImVec2(0, 0), ImVec2(1, 1), ImVec4(0, 0, 0, 0), tintColor);
     textSize = ImGui::CalcTextSize("G");
@@ -206,7 +206,7 @@ void TrackerWindow::Draw(int outerWidth, int outerHeight, float uiScale) {
 
     cursorPos = ImGui::GetCursorScreenPos();
     b = ArchipelagoHandler::customSaveData->hasUnlockedBasin && ArchipelagoHandler::customSaveData->hasUnlockedDuke;
-    brightness = semiBright;
+    brightness = b ? semiBright : lowBright;
     tintColor = ImVec4(brightness, brightness, brightness, 1.0f);
     ImGui::ImageWithBg((ImTextureID)(intptr_t)GUI::icons["level"], ImVec2(iconSize, iconSize), ImVec2(0, 0), ImVec2(1, 1), ImVec4(0, 0, 0, 0), tintColor);
     textSize = ImGui::CalcTextSize("M");

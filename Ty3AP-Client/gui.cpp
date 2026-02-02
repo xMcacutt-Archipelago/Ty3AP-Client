@@ -85,6 +85,7 @@ void GUI::DrawUI() {
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
     ImGui::SetNextWindowPos(ImVec2(windowWidth - (114 * uiScale), 0));
+    ImGui::SetNextWindowSize(ImVec2(114 * uiScale, 114 * uiScale));
     auto popupId = "APMenu";
     ImGui::Begin("AP Button", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar);
 

@@ -84,8 +84,8 @@ void GameHandler::OnChunkQueued(uintptr_t chunkPtr) {
 	{
 		API::LogPluginMessage("M17 QUEUED");
 		auto shadow2 = SaveData::FindMissionById(Mission::POWER_STRUGGLE);
-		auto extreme2 = SaveData::FindMissionById(Mission::REDBACK_RUNDOWN);
-		ArchipelagoHandler::customSaveData->savedBunyipStatuses[Mission::REDBACK_RUNDOWN] = extreme2->missionState;
+		auto extreme2 = SaveData::FindMissionById(Mission::MELTDOWN);
+		ArchipelagoHandler::customSaveData->savedBunyipStatuses[Mission::MELTDOWN] = extreme2->missionState;
 		ArchipelagoHandler::customSaveData->savedBunyipStatuses[Mission::POWER_STRUGGLE] = shadow2->missionState;
 		if (selectedBunyip == Bunyip::SHADOW) {
 			API::LogPluginMessage("SHADOW BUNYIP");
@@ -101,8 +101,8 @@ void GameHandler::OnChunkQueued(uintptr_t chunkPtr) {
 	else if (chunkNameStr == "RM29_chunk_01")
 	{
 		auto shadow3 = SaveData::FindMissionById(Mission::RANGER_ENDANGER);
-		auto extreme3 = SaveData::FindMissionById(Mission::MELTDOWN);
-		ArchipelagoHandler::customSaveData->savedBunyipStatuses[Mission::MELTDOWN] = extreme3->missionState;
+		auto extreme3 = SaveData::FindMissionById(Mission::REDBACK_RUNDOWN);
+		ArchipelagoHandler::customSaveData->savedBunyipStatuses[Mission::REDBACK_RUNDOWN] = extreme3->missionState;
 		ArchipelagoHandler::customSaveData->savedBunyipStatuses[Mission::RANGER_ENDANGER] = shadow3->missionState;
 		if (selectedBunyip == Bunyip::SHADOW) {
 			extreme3->missionState = MissionState::UNAVAILABLE;

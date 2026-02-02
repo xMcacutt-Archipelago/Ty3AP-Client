@@ -5,6 +5,11 @@ void LoggerWindow::ToggleVisibility() {
     isVisible = !isVisible;
 }
 
+inline bool IsWordBoundary(char c)
+{
+    return c == '\0' || !std::isalnum(static_cast<unsigned char>(c));
+}
+
 void LoggerWindow::Draw(int outerWidth, int outerHeight, float uiScale) {
     if (!isVisible)
         return;
@@ -106,7 +111,7 @@ void LoggerWindow::RenderFormattedText(ImDrawList* draw_list, const char* text, 
         {"Fire Stone", IM_COL32(0xD6, 0x06, 0x06, 0xFF)},
         {"Water Stone", IM_COL32(0x1A, 0x2E, 0xDB, 0xFF)},
         {"Air Stone", IM_COL32(0x47, 0xFF, 0x4A, 0xFF)},
-        {"Earth Stone", IM_COL32(0x63, 0x5D, 0x03, 0xFF)},
+        {"Earth Stone", IM_COL32(0xCC, 0xB3, 0x14, 0xFF)},
         {"Chrono Stone", IM_COL32(0xAF, 0x03, 0xFF, 0xFF)},
         {"Warp Stone", IM_COL32(0xAF, 0x7C, 0xEB, 0xFF)},
         {"Ultra Stone", IM_COL32(0xA6, 0xE9, 0xF5, 0xFF)},
@@ -121,10 +126,10 @@ void LoggerWindow::RenderFormattedText(ImDrawList* draw_list, const char* text, 
         {"Opals", IM_COL32(0xFF, 0x3D, 0x3B, 0xFF)},
         {"Duo Chassis", IM_COL32(0x85, 0x85, 0x85, 0xFF)},
         {"Lash Chassis", IM_COL32(0xE8, 0xE4, 0x43, 0xFF)},
-        {"Smash Chassis", IM_COL32(0x66, 0x65, 0x26, 0xFF)},
+        {"Smash Chassis", IM_COL32(0xCC, 0xB3, 0x14, 0xFF)},
         {"Mega Chassis", IM_COL32(0x5A, 0x77, 0x78, 0xFF)},
         {"Ring Chassis", IM_COL32(0xBA, 0xA8, 0xA8, 0xFF)},
-        {"Shadow Chassis", IM_COL32(0x35, 0x00, 0x78, 0xFF)},
+        {"Shadow Chassis", IM_COL32(0x99, 0x66, 0xff, 0xFF)},
         {"Doom Chassis", IM_COL32(0xFF, 0xD5, 0x03, 0xFF)},
         {"Shadow Beam", IM_COL32(0x24, 0xD9, 0x1E, 0xFF)},
         {"Grav Grenade", IM_COL32(0x1E, 0x95, 0xD9, 0xFF)},
@@ -187,7 +192,10 @@ void LoggerWindow::RenderFormattedText(ImDrawList* draw_list, const char* text, 
         bool keyword_hit = false;
         for (const auto& [keyword, color] : keywordColors) {
             size_t len = keyword.length();
-            if (compareStrings(s, keyword.c_str(), len) && (s[len] == ' ' || s[len] == '\0')) {
+            char prev = (s == text) ? '\0' : s[-1];
+            if (compareStrings(s, keyword.c_str(), len) &&
+                IsWordBoundary(prev) &&
+                IsWordBoundary(s[len])) {
                 // Draw previous segment before keyword
                 if (segment_start < s) {
                     draw_list->AddText(ImVec2(x_pos, pos.y), current_color, segment_start, s);
